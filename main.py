@@ -12,6 +12,7 @@ from crews.villa_puppy.crew_villa_puppy import build_crew_villapuppy
 from crews.dra_angelica.crew_angelica import build_crew_angelica
 from crews.dra_emmen.crew_emmen import build_crew_emmen
 from crews.dra_catarine.crew_catarine import build_crew_catarine
+from crews.clinicas_nexo.crew_clinicas_nexo import build_crew_clinicasnexo
 
 
 
@@ -101,6 +102,14 @@ def executar_crew_emmen(tema: str = Query(...), palavra_chave: str = Query(...))
 @app.get("/dra_catarine_backlink")
 def executar_crew_catarine(tema: str = Query(...), palavra_chave: str = Query(...)):
     crew = build_crew_catarine(tema, palavra_chave)
+    resultado = crew.kickoff()
+    return JSONResponse(content=resultado.model_dump())
+
+
+@app.get("/clinicas_nexo")
+@app.get("/clinicas_nexo_backlink")
+def executar_crew_clinicasnexo(tema: str = Query(...), palavra_chave: str = Query(...)):
+    crew = build_crew_clinicasnexo(tema, palavra_chave)
     resultado = crew.kickoff()
     return JSONResponse(content=resultado.model_dump())
 
