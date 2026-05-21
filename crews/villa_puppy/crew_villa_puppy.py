@@ -4,7 +4,9 @@ from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
-llm = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
+llm_fast     = LLM(model="gemini/gemini-2.0-flash", temperature=0.4)
 
 # -------------------------------
 # Catálogo fixo de links internos (Villa Puppy)
@@ -130,7 +132,6 @@ def build_crew_villapuppy(tema: str, palavra_chave: str):
     - Anchors descritivas; externos com target="_blank" rel="noopener noreferrer".
     - Conclusão sem CTA comercial; CTA/assinatura ao final (padrão Villa Puppy, personalizado ao tema).
     """
-    llm_local = llm
 
     # Monta referências e links automaticamente
     dados_concorrencia_txt = buscar_concorrentes_serpapi_texto(palavra_chave)
@@ -143,42 +144,42 @@ def build_crew_villapuppy(tema: str, palavra_chave: str):
         role="Redator de Introdução (Pet)",
         goal="Escrever introdução clara e acolhedora (2–3 parágrafos), mencionando a palavra‑chave 1x.",
         backstory="Especialista em conteúdo para tutores; tom empático, prático e confiável.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_outline = Agent(
         role="Arquiteto de Estrutura (H2/H3) com numeração",
         goal="Definir 5–7 H2 numerados (1., 2., 3., ...), com H3 opcionais; cobrir a intenção de busca e incluir a palavra‑chave em pelo menos um heading.",
         backstory="Especialista em outline SEO para varejo pet; nunca usa H1; títulos específicos.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
 
     agente_desenvolvimento = Agent(
         role="Redator de Desenvolvimento (Pet)",
         goal="Preencher cada seção com <p> curtos e listas, com orientações práticas de cuidado, higiene, alimentação e bem‑estar.",
         backstory="Conteúdo útil, direto, com exemplos reais e linguagem acessível para tutores.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_conclusao = Agent(
         role="Redator de Conclusão (sem CTA)",
         goal="Encerrar resumindo aprendizados e próximos passos práticos (checklist simples para o tutor).",
         backstory="Fechamentos objetivos e acolhedores.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_unificador = Agent(
         role="Unificador de Conteúdo HTML",
         goal="Unir tudo em HTML único (apenas body), coerente, sem redundância, com numeração dos H2 e sem imagens.",
         backstory="Editor técnico focado em semântica e limpeza de HTML.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_linkagem = Agent(
         role="Planejador e Implementador de Linkagem",
         goal="Inserir links internos/externos de forma natural e distribuída, respeitando todas as regras e o tom Villa Puppy.",
         backstory="Especialista em internal linking e EEAT no universo pet.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_contato = Agent(
@@ -191,21 +192,21 @@ def build_crew_villapuppy(tema: str, palavra_chave: str):
             "4) linha final com uma chamada relacionada ao tema."
         ),
         backstory="Padronização e identidade afetiva da marca, mantendo foco em conveniência para o tutor.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_revisor = Agent(
         role="Revisor Sênior",
         goal="Listar melhorias objetivas (bullets) em clareza, gramática, estilo, distribuição de links e regras SEO.",
         backstory="Revisor PT‑BR; corta redundâncias; mantém consistência.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
 
     agente_executor = Agent(
         role="Executor de Revisões",
         goal="Aplicar todas as melhorias preservando estrutura semântica e linkagem.",
         backstory="Editor/Dev de HTML limpo.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     # ==== Tarefas ====

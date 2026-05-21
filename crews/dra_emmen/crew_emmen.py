@@ -4,7 +4,9 @@ from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
-llm = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
+llm_fast     = LLM(model="gemini/gemini-2.0-flash", temperature=0.4)
 
 # -------------------------------
 # Catálogo fixo de links internos (Dra. Emmen Rocha)
@@ -115,7 +117,6 @@ def build_crew_emmen(tema: str, palavra_chave: str):
     - Conclusão sem CTA comercial; CTA na assinatura ao final.
     - Foco exclusivo em ginecologia, obstetrícia e saúde da mulher.
     """
-    llm_local = llm
 
     # Monta referências e links automaticamente
     dados_concorrencia_txt = buscar_concorrentes_serpapi_texto(palavra_chave)
@@ -128,63 +129,63 @@ def build_crew_emmen(tema: str, palavra_chave: str):
         role="Redator de Introdução Ginecologia e Obstetrícia",
         goal="Escrever introdução clara, acolhedora e empática (2–3 parágrafos) no estilo médico educativo, citando a palavra‑chave 1x e focando em ginecologia/obstetrícia.",
         backstory="Copywriter especializado em comunicação médica ginecológica; evita promessas exageradas; tom acolhedor mas científico; parágrafos curtos; sem imagens.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_outline = Agent(
         role="Arquiteto de Estrutura Ginecologia (H2/H3) com numeração",
         goal="Definir 5–7 H2 numerados (1., 2., 3., ...), com H3 opcionais; cobrir aspectos de ginecologia/obstetrícia e incluir a palavra‑chave em pelo menos um heading.",
         backstory="Especialista em estrutura de conteúdo médico ginecológico; nunca usa H1; títulos específicos focados em saúde da mulher.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
 
     agente_desenvolvimento = Agent(
         role="Redator de Desenvolvimento Ginecologia",
         goal="Preencher cada seção com <p> curtos, informações técnicas precisas sobre ginecologia/obstetrícia, listas úteis, variar semântica da keyword sem stuffing e sem inserir imagens.",
         backstory="Conteúdo médico educativo sobre ginecologia e obstetrícia, científico mas acessível, sem promessas exageradas.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_conclusao = Agent(
         role="Redator de Conclusão Ginecologia (sem CTA)",
         goal="Encerrar resumindo aprendizados médicos ginecológicos e orientações práticas sem convite comercial direto.",
         backstory="Fechamentos educativos focados em saúde da mulher e bem-estar ginecológico.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_unificador = Agent(
         role="Unificador de Conteúdo HTML Ginecologia",
         goal="Unir tudo em HTML único (apenas body), coerente, sem redundância, com numeração dos H2 e sem imagens, mantendo rigor científico em ginecologia.",
         backstory="Editor técnico focado em conteúdo médico ginecológico, semântica e limpeza de HTML.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_linkagem = Agent(
         role="Planejador e Implementador de Linkagem Ginecologia",
         goal="Inserir links internos/externos de forma natural e distribuída, priorizando fontes médicas autoritativas e serviços ginecológicos.",
         backstory="Especialista em EEAT médico e linkagem para autoridade em ginecologia e obstetrícia.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_contato = Agent(
         role="Responsável por Contato e Assinatura Ginecologia",
         goal="Anexar assinatura institucional da Dra. Emmen Rocha ao final do HTML (CTA/site), sem alterar o conteúdo anterior.",
         backstory="Padronização e identidade institucional médica ginecológica.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_revisor = Agent(
         role="Revisor Sênior Ginecologia",
         goal="Listar melhorias objetivas (bullets) em clareza, precisão médica ginecológica, gramática, distribuição de links e adequação ao público leigo.",
         backstory="Revisor PT‑BR especializado em textos médicos ginecológicos; corta redundâncias; mantém rigor científico acessível.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
 
     agente_executor = Agent(
         role="Executor de Revisões Ginecologia",
         goal="Aplicar todas as melhorias preservando estrutura semântica, linkagem e precisão médica ginecológica.",
         backstory="Editor/Dev de HTML limpo especializado em conteúdo médico ginecológico.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     # ==== Tarefas ====

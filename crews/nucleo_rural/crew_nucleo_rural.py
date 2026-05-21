@@ -4,7 +4,9 @@ from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
-llm = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
+llm_fast     = LLM(model="gemini/gemini-2.0-flash", temperature=0.4)
 
 # -------------------------------
 # Catálogo fixo de links internos (Núcleo Rural)
@@ -115,7 +117,6 @@ def build_crew_nucleorural(tema: str, palavra_chave: str):
     - Conclusão sem CTA comercial; CTA na assinatura ao final.
     - Linguagem técnica e direta, focada em resultados práticos no campo (pecuária, manejo, sanidade, produtividade).
     """
-    llm_local = llm
 
     # Monta referências e links automaticamente
     dados_concorrencia_txt = buscar_concorrentes_serpapi_texto(palavra_chave)
@@ -128,63 +129,63 @@ def build_crew_nucleorural(tema: str, palavra_chave: str):
         role="Redator de Introdução Agro",
         goal="Escrever introdução clara e objetiva (2–3 parágrafos) no tom técnico da Núcleo Rural, citando a palavra‑chave 1x.",
         backstory="Especialista em conteúdo para produtores rurais; prioriza clareza, contexto prático e ganho de produtividade.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_outline = Agent(
         role="Arquiteto de Estrutura (H2/H3) com numeração",
         goal="Definir 5–7 H2 numerados (1., 2., 3., ...), com H3 opcionais; cobrir a intenção de busca e incluir a palavra‑chave em pelo menos um heading.",
         backstory="Especialista em outline SEO para agronegócio; nunca usa H1; títulos específicos.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
 
     agente_desenvolvimento = Agent(
         role="Redator de Desenvolvimento Agro",
         goal="Preencher cada seção com <p> curtos e listas com foco em manejo, sanidade, índices zootécnicos e ROI.",
         backstory="Conteúdo útil, direto, com exemplos de campo (bezerros, ganho de peso, IATF, controle de parasitas, bem‑estar animal).",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_conclusao = Agent(
         role="Redator de Conclusão (sem CTA)",
         goal="Encerrar resumindo aprendizados e próximos passos práticos (checklist de implementação, métricas para acompanhar).",
         backstory="Fechamentos objetivos para tomada de decisão no campo.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_unificador = Agent(
         role="Unificador de Conteúdo HTML",
         goal="Unir tudo em HTML único (apenas body), coerente, sem redundância, com numeração dos H2 e sem imagens.",
         backstory="Editor técnico focado em semântica e limpeza de HTML.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_linkagem = Agent(
         role="Planejador e Implementador de Linkagem",
         goal="Inserir links internos/externos de forma natural e distribuída, respeitando todas as regras e o tom Núcleo Rural.",
         backstory="Especialista em internal linking e EEAT para agro.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_contato = Agent(
         role="Responsável por Contato e Assinatura (Núcleo Rural)",
         goal="Anexar assinatura institucional da Núcleo Rural ao final do HTML (CTA/WhatsApp), sem alterar o conteúdo anterior.",
         backstory="Padronização e identidade institucional focada no produtor rural.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_revisor = Agent(
         role="Revisor Sênior",
         goal="Listar melhorias objetivas (bullets) em clareza, gramática, estilo, distribuição de links e regras SEO.",
         backstory="Revisor PT‑BR; corta redundâncias; mantém consistência.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
 
     agente_executor = Agent(
         role="Executor de Revisões",
         goal="Aplicar todas as melhorias preservando estrutura semântica e linkagem.",
         backstory="Editor/Dev de HTML limpo.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     # ==== Tarefas ====

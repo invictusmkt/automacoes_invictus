@@ -5,7 +5,9 @@ from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
-llm = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
+llm_fast     = LLM(model="gemini/gemini-2.0-flash", temperature=0.4)
 
 # -------------------------------
 # Catálogo fixo de links internos (Instituto Nexo)
@@ -143,7 +145,6 @@ def build_crew_clinicasnexo(tema: str, palavra_chave: str):
     - Conclusão sem CTA comercial; CTA na assinatura ao final.
     - Linguagem empática, sem julgamentos, baseada em evidências científicas.
     """
-    llm_local = llm
 
     dados_concorrencia_txt = buscar_concorrentes_serpapi_texto(palavra_chave)
     serp_struct = buscar_concorrentes_serpapi_struct(palavra_chave)
@@ -155,63 +156,63 @@ def build_crew_clinicasnexo(tema: str, palavra_chave: str):
         role="Redator de Introdução — Saúde Mental e Psicologia",
         goal="Escrever introdução acolhedora e empática (2–3 parágrafos), citando a palavra-chave 1x, sem estigmatizar e sem promessas de cura.",
         backstory="Profissional de comunicação em saúde mental que traduz conceitos técnicos com linguagem acessível, inclusiva e não-julgadora.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_outline = Agent(
         role="Arquiteto de Estrutura (H2/H3) — Psicologia e TEA",
         goal="Definir 5–7 H2 numerados com H3 opcionais; contemplar jornada do paciente/família, evidências científicas, indicações e próximos passos.",
         backstory="Especialista em outline SEO para clínicas de saúde mental; foca na intenção de busca de familiares e pacientes.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
 
     agente_desenvolvimento = Agent(
         role="Redator de Desenvolvimento — Psicologia Aplicada",
         goal="Preencher cada seção com <p> curtos e listas, cobrindo: o que é, indicações, como funciona o processo, expectativas realistas, evidências e dicas práticas.",
         backstory="Conteúdo baseado em evidências, empático e acessível para leigos; sem linguagem clínica excessiva e sem promessas.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_conclusao = Agent(
         role="Redator de Conclusão — Próximos Passos em Saúde Mental",
         goal="Encerrar com síntese objetiva, próximos passos práticos e encorajamento gentil para buscar apoio profissional.",
         backstory="Foco em empoderamento, redução de estigma e decisão informada.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_unificador = Agent(
         role="Unificador de Conteúdo HTML",
         goal="Unir tudo em HTML único (apenas body), coerente, sem redundância, com numeração dos H2 e sem imagens.",
         backstory="Editor técnico focado em semântica, legibilidade e consistência.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_linkagem = Agent(
         role="Planejador e Implementador de Linkagem — Instituto Nexo",
         goal="Inserir links internos/externos de forma natural, distribuída e compatível com EEAT em saúde.",
         backstory="Especialista em internal linking para institutos de saúde; prioriza fontes oficiais (CFP, CRP, gov.br) e páginas de serviços do Nexo.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_assinatura = Agent(
         role="Responsável por Assinatura — Instituto Nexo",
         goal="Anexar assinatura institucional ao final (CTA/WhatsApp), sem alterar o conteúdo anterior.",
         backstory="Padronização acolhedora, linguagem gentil e objetiva, alinhada aos valores do Nexo.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_revisor = Agent(
         role="Revisor Sênior — Conteúdo de Saúde Mental",
         goal="Listar melhorias objetivas (bullets) em clareza, empatia, tom não-estigmatizador, distribuição de links e regras SEO.",
         backstory="Revisor PT-BR especializado em saúde; zela por linguagem inclusiva, não-julgadora e livre de promessas.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
 
     agente_executor = Agent(
         role="Executor de Revisões",
         goal="Aplicar todas as melhorias preservando estrutura semântica e linkagem.",
         backstory="Editor/Dev de HTML limpo.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     # ==== Tarefas ====

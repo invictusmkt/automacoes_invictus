@@ -4,7 +4,9 @@ from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
-llm = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
+llm_fast     = LLM(model="gemini/gemini-2.0-flash", temperature=0.4)
 
 # -------------------------------
 # Catálogo fixo de links internos (THÁ Dermatologia)
@@ -123,7 +125,6 @@ def build_crew_gustavo(tema: str, palavra_chave: str):
     - Anchors descritivas; externos com target="_blank" rel="noopener noreferrer".
     - Conclusão sem CTA comercial; CTA na assinatura ao final.
     """
-    llm_local = llm
 
     # Monta referências e links automaticamente
     dados_concorrencia_txt = buscar_concorrentes_serpapi_texto(palavra_chave)
@@ -136,63 +137,63 @@ def build_crew_gustavo(tema: str, palavra_chave: str):
         role="Redator de Introdução",
         goal="Escrever introdução clara e persuasiva (2–3 parágrafos) no estilo do modelo fornecido, citando a palavra‑chave 1x.",
         backstory="Copywriter sênior em dermatologia; evita clichês; parágrafos curtos; sem imagens.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_outline = Agent(
         role="Arquiteto de Estrutura (H2/H3) com numeração",
         goal="Definir 5–7 H2 numerados (1., 2., 3., ...), com H3 opcionais; cobrir a intenção de busca e incluir a palavra‑chave em pelo menos um heading.",
         backstory="Especialista em outline SEO; nunca usa H1; títulos específicos.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
 
     agente_desenvolvimento = Agent(
         role="Redator de Desenvolvimento",
         goal="Preencher cada seção com <p> curtos e listas úteis, variar semântica da keyword sem stuffing e sem inserir imagens.",
         backstory="Conteúdo útil, direto, com exemplos práticos.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_conclusao = Agent(
         role="Redator de Conclusão (sem CTA)",
         goal="Encerrar resumindo aprendizados e próximos passos práticos sem convite comercial.",
         backstory="Fechamentos naturais e objetivos.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_unificador = Agent(
         role="Unificador de Conteúdo HTML",
         goal="Unir tudo em HTML único (apenas body), coerente, sem redundância, com numeração dos H2 e sem imagens.",
         backstory="Editor técnico focado em semântica e limpeza de HTML.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_linkagem = Agent(
         role="Planejador e Implementador de Linkagem",
         goal="Inserir links internos/externos de forma natural e distribuída, como no modelo, respeitando todas as regras.",
         backstory="Especialista em internal linking e EEAT.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_contato = Agent(
         role="Responsável por Contato e Assinatura",
         goal="Anexar assinatura institucional da THÁ Dermatologia ao final do HTML (CTA/WhatsApp), sem alterar o conteúdo anterior.",
         backstory="Padronização e identidade institucional.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_revisor = Agent(
         role="Revisor Sênior",
         goal="Listar melhorias objetivas (bullets) em clareza, gramática, estilo do modelo, distribuição de links e regras SEO.",
         backstory="Revisor PT‑BR; corta redundâncias; mantém consistência.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
 
     agente_executor = Agent(
         role="Executor de Revisões",
         goal="Aplicar todas as melhorias preservando estrutura semântica e linkagem.",
         backstory="Editor/Dev de HTML limpo.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     # ==== Tarefas ====

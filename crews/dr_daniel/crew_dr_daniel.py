@@ -5,7 +5,9 @@ from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
-llm = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
+llm_fast     = LLM(model="gemini/gemini-2.0-flash", temperature=0.4)
 
 # -------------------------------
 # Catálogo fixo de links internos (Dr. Daniel Rebolledo)
@@ -89,7 +91,6 @@ def build_crew_drdaniel(tema: str, palavra_chave: str):
     oncologia ortopédica com atuação em hospitais de referência (Sírio-Libanês,
     Albert Einstein, Oswaldo Cruz, Santa Catarina).
     """
-    llm_local = llm
     dados_concorrencia_txt = buscar_concorrentes_serpapi_texto(palavra_chave)
     serp_struct = buscar_concorrentes_serpapi_struct(palavra_chave)
     links_internos = LINKS_INTERNOS_DRDANIEL[:]
@@ -99,55 +100,55 @@ def build_crew_drdaniel(tema: str, palavra_chave: str):
         role="Redator de Introdução — Cirurgia de Quadril e Oncologia Ortopédica",
         goal="Escrever introdução técnica e humanizada (2–3 parágrafos), citando a palavra-chave 1x, transmitindo autoridade médica e cuidado ao paciente.",
         backstory="Profissional de conteúdo médico especializado em ortopedia; equilibra tecnicidade e acolhimento.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
     agente_outline = Agent(
         role="Arquiteto de Estrutura (H2/H3) — Ortopedia e Oncologia",
         goal="Definir 5–7 H2 numerados com H3 opcionais; contemplar anatomia, causas, diagnóstico, opções de tratamento, cirurgia e recuperação.",
         backstory="Especialista em outline SEO para cirurgiões ortopédicos; foca na jornada do paciente do diagnóstico ao pós-operatório.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
     agente_desenvolvimento = Agent(
         role="Redator de Desenvolvimento — Ortopedia e Oncologia Ortopédica",
         goal="Preencher cada seção com <p> curtos e listas; cobrir: anatomia, causas, diagnóstico clínico/imagem, opções conservadoras, indicação cirúrgica, técnicas, recuperação e prognóstico.",
         backstory="Conteúdo médico de alta precisão, baseado em evidências, sem prometer resultados garantidos.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
     agente_conclusao = Agent(
         role="Redator de Conclusão — Ortopedia",
         goal="Encerrar com síntese objetiva, importância do diagnóstico precoce e próximos passos (consulta especializada), sem CTA.",
         backstory="Foco em decisão informada e importância do acompanhamento especializado.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
     agente_unificador = Agent(
         role="Unificador de Conteúdo HTML",
         goal="Unir tudo em HTML único (body only), coerente, com numeração dos H2 e sem imagens.",
         backstory="Editor técnico focado em semântica e limpeza.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
     agente_linkagem = Agent(
         role="Planejador de Linkagem — Dr. Daniel Rebolledo",
         goal="Inserir links internos/externos de forma natural, distribuída e compatível com EEAT médico.",
         backstory="Especialista em internal linking para cirurgiões; prioriza INCA, SBOT, gov.br e artigos científicos.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
     agente_assinatura = Agent(
         role="Responsável por Assinatura — Dr. Daniel Rebolledo",
         goal="Anexar assinatura institucional ao final, sem alterar o conteúdo anterior.",
         backstory="Padronização profissional e humanizada.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
     agente_revisor = Agent(
         role="Revisor Sênior — Conteúdo Médico-Cirúrgico",
         goal="Listar melhorias em precisão técnica, tom humanizado, distribuição de links e regras SEO.",
         backstory="Revisor PT-BR especializado em ortopedia; sem promessas e sem linguagem alarmista.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
     agente_executor = Agent(
         role="Executor de Revisões",
         goal="Aplicar todas as melhorias preservando estrutura semântica e linkagem.",
         backstory="Editor/Dev de HTML limpo.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     tarefa_intro = Task(

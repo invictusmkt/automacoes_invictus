@@ -5,7 +5,9 @@ from crewai import Crew, Agent, Task, LLM
 
 
 load_dotenv()
-llm = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
+llm_fast     = LLM(model="gemini/gemini-2.0-flash", temperature=0.4)
 
 def buscar_concorrentes_serpapi(palavra_chave):
     search = GoogleSearch({
@@ -34,7 +36,7 @@ def build_crew_erika(tema: str, palavra_chave: str):
         backstory="Especialista em comunicar temas de dermatologia clínica, cirúrgica e estética com ênfase em saúde e prevenção.",
         verbose=True,
         allow_delegation=False,
-        llm=llm,
+        llm=llm_no_think,
     )
 
     agente_meio_h2 = Agent(
@@ -43,7 +45,7 @@ def build_crew_erika(tema: str, palavra_chave: str):
         backstory="Especialista em estruturar conteúdos médicos para facilitar a leitura e reforçar autoridade profissional.",
         verbose=True,
         allow_delegation=False,
-        llm=llm,
+        llm=llm_thinking,
     )
 
     agente_meio_lista = Agent(
@@ -52,7 +54,7 @@ def build_crew_erika(tema: str, palavra_chave: str):
         backstory="Profissional com experiência em comunicar tecnologias, cuidados estéticos e dermatológicos com linguagem técnica e acessível.",
         verbose=True,
         allow_delegation=False,
-        llm=llm,
+        llm=llm_no_think,
     )
 
     agente_conclusao = Agent(
@@ -61,7 +63,7 @@ def build_crew_erika(tema: str, palavra_chave: str):
         backstory="Especialista em conclusões institucionais na área médica, focada em reforçar confiança e credibilidade.",
         verbose=True,
         allow_delegation=False,
-        llm=llm,
+        llm=llm_no_think,
     )
 
     agente_contato = Agent(
@@ -70,7 +72,7 @@ def build_crew_erika(tema: str, palavra_chave: str):
         backstory="Responsável por reforçar a presença institucional da Dra. Erika, com foco em comunicação acolhedora e profissional.",
         verbose=True,
         allow_delegation=False,
-        llm=llm,
+        llm=llm_fast,
     )
 
     agente_unificador = Agent(
@@ -79,7 +81,7 @@ def build_crew_erika(tema: str, palavra_chave: str):
         backstory="Especialista em estruturação de conteúdo médico para web, focando em legibilidade e organização.",
         verbose=True,
         allow_delegation=False,
-        llm=llm,
+        llm=llm_fast,
     )
 
     agente_revisor = Agent(
@@ -88,7 +90,7 @@ def build_crew_erika(tema: str, palavra_chave: str):
         backstory="Revisora experiente em conteúdos médicos, estética e saúde, com foco na combinação de técnica e acolhimento.",
         verbose=True,
         allow_delegation=False,
-        llm=llm,
+        llm=llm_thinking,
     )
 
     agente_executor = Agent(
@@ -97,7 +99,7 @@ def build_crew_erika(tema: str, palavra_chave: str):
         backstory="Responsável por ajustar e finalizar conteúdos para publicação, garantindo fidelidade à proposta editorial.",
         verbose=True,
         allow_delegation=False,
-        llm=llm,
+        llm=llm_no_think,
     )
 
     agente_seo = Agent(
@@ -106,7 +108,7 @@ def build_crew_erika(tema: str, palavra_chave: str):
         backstory="Consultor de SEO para clínicas médicas, focado em otimizar conteúdo para buscas locais e médicas.",
         verbose=True,
         allow_delegation=False,
-        llm=llm,
+        llm=llm_no_think,
     )
 
     agente_finalizador = Agent(
@@ -115,7 +117,7 @@ def build_crew_erika(tema: str, palavra_chave: str):
         backstory="Responsável por transformar conteúdos finais em JSON estruturado para publicação automatizada.",
         verbose=True,
         allow_delegation=False,
-        llm=llm,
+        llm=llm_fast,
     )
 
     tarefas = [

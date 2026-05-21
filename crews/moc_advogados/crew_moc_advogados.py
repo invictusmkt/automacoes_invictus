@@ -5,7 +5,9 @@ from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
-llm = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
+llm_fast     = LLM(model="gemini/gemini-2.0-flash", temperature=0.4)
 
 # -------------------------------
 # Catálogo fixo de links internos (MOC Advogados)
@@ -83,7 +85,6 @@ def build_crew_mocadvogados(tema: str, palavra_chave: str):
     Act with technique." Atua em direito tributário, trabalhista, previdenciário,
     civil e planos de saúde. Escritórios em Rio Preto, Marília e Santos.
     """
-    llm_local = llm
     dados_concorrencia_txt = buscar_concorrentes_serpapi_texto(palavra_chave)
     serp_struct = buscar_concorrentes_serpapi_struct(palavra_chave)
     links_internos = LINKS_INTERNOS_MOC[:]
@@ -93,55 +94,55 @@ def build_crew_mocadvogados(tema: str, palavra_chave: str):
         role="Redator de Introdução — Advocacia Estratégica",
         goal="Escrever introdução profissional e acessível (2–3 parágrafos), citando a palavra-chave 1x, no tom MOC: técnico, humano e estratégico.",
         backstory="Comunicador jurídico que traduz o direito em linguagem clara para empresas e pessoas físicas.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
     agente_outline = Agent(
         role="Arquiteto de Estrutura (H2/H3) — Direito",
         goal="Definir 5–7 H2 numerados com H3 opcionais; contemplar: o que é, legislação aplicável, direitos e deveres, como agir, erros comuns e quando contratar um advogado.",
         backstory="Especialista em outline SEO para escritórios de advocacia; foca na dúvida prática do cliente.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
     agente_desenvolvimento = Agent(
         role="Redator de Desenvolvimento — Conteúdo Jurídico",
         goal="Preencher cada seção com <p> curtos e listas; cobrir: conceito legal, base normativa, direitos e deveres, como funciona na prática, erros comuns e dicas preventivas.",
         backstory="Conteúdo jurídico acessível e preciso; sem dar consultoria individualizada; sempre recomendar advogado.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
     agente_conclusao = Agent(
         role="Redator de Conclusão — Advocacia",
         goal="Encerrar com síntese objetiva e importância de contar com assessoria jurídica especializada, sem CTA comercial.",
         backstory="Foco em prevenção de riscos e decisão informada.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
     agente_unificador = Agent(
         role="Unificador de Conteúdo HTML",
         goal="Unir tudo em HTML único (body only), coerente, com numeração dos H2 e sem imagens.",
         backstory="Editor técnico focado em semântica e limpeza.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
     agente_linkagem = Agent(
         role="Planejador de Linkagem — MOC Advogados",
         goal="Inserir links internos/externos de forma natural, distribuída; priorizar fontes legislativas e jurisprudência.",
         backstory="Especialista em internal linking para escritórios; prioriza Planalto, STJ, TST e OAB.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
     agente_assinatura = Agent(
         role="Responsável por Assinatura — MOC Advogados",
         goal="Anexar assinatura institucional ao final, sem alterar o conteúdo anterior.",
         backstory="Padronização profissional alinhada ao método MOC.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
     agente_revisor = Agent(
         role="Revisor Sênior — Conteúdo Jurídico",
         goal="Listar melhorias em clareza, precisão legal, tom estratégico e humanizado, distribuição de links e SEO.",
         backstory="Revisor PT-BR; sem afirmações absolutas sobre resultados jurídicos; sempre 'pode' ou 'em regra'.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
     agente_executor = Agent(
         role="Executor de Revisões",
         goal="Aplicar todas as melhorias preservando estrutura semântica e linkagem.",
         backstory="Editor/Dev de HTML limpo.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     tarefa_intro = Task(

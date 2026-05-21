@@ -5,7 +5,9 @@ from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
-llm = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
+llm_fast     = LLM(model="gemini/gemini-2.0-flash", temperature=0.4)
 
 # -------------------------------
 # Catálogo fixo de links internos (Clínica Dr. Raimundo Nunes)
@@ -110,7 +112,6 @@ def build_crew_drraimundo(tema: str, palavra_chave: str):
     Tom: conteúdo estritamente educativo (alinhado ao CFM); nunca prometer resultado;
     enfatizar avaliação individualizada e escuta ativa.
     """
-    llm_local = llm
     dados_concorrencia_txt = buscar_concorrentes_serpapi_texto(palavra_chave)
     serp_struct = buscar_concorrentes_serpapi_struct(palavra_chave)
     links_internos = LINKS_INTERNOS_DRRAIMUNDO[:]
@@ -120,55 +121,55 @@ def build_crew_drraimundo(tema: str, palavra_chave: str):
         role="Redatora de Introdução — Ginecologia e Saúde da Mulher",
         goal="Escrever introdução humanizada e acolhedora (2–3 parágrafos), citando a palavra-chave 1x, com foco na saúde integral da mulher em todas as fases da vida.",
         backstory="Comunicadora médica especializada em saúde feminina; transmite autoridade clínica com escuta ativa e cuidado personalizado. Conteúdo estritamente educativo (CFM).",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
     agente_outline = Agent(
         role="Arquiteto de Estrutura (H2/H3) — Ginecologia e Obstetrícia",
         goal="Definir 5–7 H2 numerados com H3 opcionais; contemplar: o que é, quem se beneficia, como é feito, cuidados, mitos e quando buscar um especialista.",
         backstory="Especialista em outline SEO para clínicas ginecológicas de referência; foca na jornada da paciente do diagnóstico ao acompanhamento.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
     agente_desenvolvimento = Agent(
         role="Redatora de Desenvolvimento — Saúde Feminina Integral",
         goal="Preencher cada seção com <p> curtos e listas; cobrir: conceito, indicações, como funciona, cuidados, expectativas realistas, mitos e quando consultar um ginecologista.",
         backstory="Conteúdo ginecológico preciso, acolhedor e educativo; alinhado ao CFM — sem prometer resultados, sempre recomendando consulta especializada.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
     agente_conclusao = Agent(
         role="Redatora de Conclusão — Saúde da Mulher",
         goal="Encerrar com síntese encorajadora e importância do acompanhamento ginecológico regular, sem CTA comercial.",
         backstory="Foco em empoderamento feminino, prevenção e decisão informada.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
     agente_unificador = Agent(
         role="Unificador de Conteúdo HTML",
         goal="Unir tudo em HTML único (body only), coerente, com numeração dos H2 e sem imagens.",
         backstory="Editor técnico focado em semântica e limpeza.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
     agente_linkagem = Agent(
         role="Planejador de Linkagem — Clínica Dr. Raimundo Nunes",
         goal="Inserir links internos/externos de forma natural, distribuída e compatível com EEAT médico.",
         backstory="Especialista em internal linking para clínicas ginecológicas; prioriza FEBRASGO, CFM, INCA e gov.br.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
     agente_assinatura = Agent(
         role="Responsável por Assinatura — Clínica Dr. Raimundo Nunes",
         goal="Anexar assinatura institucional ao final, sem alterar o conteúdo anterior.",
         backstory="Padronização humanizada e acolhedora, alinhada aos 30+ anos de tradição da clínica.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
     agente_revisor = Agent(
         role="Revisora Sênior — Conteúdo Ginecológico",
         goal="Listar melhorias em clareza, tom acolhedor e ético, distribuição de links, conformidade CFM e SEO.",
         backstory="Revisora PT-BR especializada em saúde feminina; sem promessas; linguagem inclusiva e não-alarmista.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
     agente_executor = Agent(
         role="Executor de Revisões",
         goal="Aplicar todas as melhorias preservando estrutura semântica e linkagem.",
         backstory="Editor/Dev de HTML limpo.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     tarefa_intro = Task(
