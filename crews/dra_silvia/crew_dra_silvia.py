@@ -5,7 +5,9 @@ from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
-llm = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
+llm_fast     = LLM(model="gemini/gemini-2.0-flash", temperature=0.4)
 
 # -------------------------------
 # Catálogo fixo de links internos (ITC Vertebral Jundiaí)
@@ -73,7 +75,6 @@ def build_crew_drasilvia(tema: str, palavra_chave: str):
     profissional, acolhedor e baseado em evidências — fisioterapia especializada
     em coluna vertebral, com foco em alternativas não-cirúrgicas.
     """
-    llm_local = llm
     dados_concorrencia_txt = buscar_concorrentes_serpapi_texto(palavra_chave)
     serp_struct = buscar_concorrentes_serpapi_struct(palavra_chave)
     links_internos = LINKS_INTERNOS_ITCVERTEBRAL[:]
@@ -83,55 +84,55 @@ def build_crew_drasilvia(tema: str, palavra_chave: str):
         role="Redator de Introdução — Fisioterapia e Saúde da Coluna",
         goal="Escrever introdução empática e profissional (2–3 parágrafos), citando a palavra-chave 1x, com foco em alívio da dor e alternativas seguras à cirurgia.",
         backstory="Comunicador em saúde que transmite esperança realista a pacientes com dor crônica na coluna.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
     agente_outline = Agent(
         role="Arquiteto de Estrutura (H2/H3) — Coluna Vertebral",
         goal="Definir 5–7 H2 numerados com H3 opcionais; contemplar causas, sintomas, quando buscar tratamento, como funciona a fisioterapia e expectativas realistas.",
         backstory="Especialista em outline SEO para clínicas de reabilitação; foca na dúvida do paciente que quer evitar cirurgia.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
     agente_desenvolvimento = Agent(
         role="Redator de Desenvolvimento — Fisioterapia Vertebral",
         goal="Preencher cada seção com <p> curtos e listas; cobrir causas, diagnóstico, protocolo de tratamento, exercícios, cuidados e quando buscar avaliação profissional.",
         backstory="Conteúdo baseado em evidências; ~90% de resultados positivos quando bem indicado; sem promessas de cura.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
     agente_conclusao = Agent(
         role="Redator de Conclusão — Fisioterapia",
         goal="Encerrar com síntese encorajadora e próximos passos (avaliação clínica, sinais de alerta), sem CTA comercial.",
         backstory="Foco em empoderamento do paciente e redução do medo da dor crônica.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
     agente_unificador = Agent(
         role="Unificador de Conteúdo HTML",
         goal="Unir tudo em HTML único (body only), coerente, com numeração dos H2 e sem imagens.",
         backstory="Editor técnico focado em semântica e limpeza.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
     agente_linkagem = Agent(
         role="Planejador de Linkagem — ITC Vertebral",
         goal="Inserir links internos/externos de forma natural, distribuída e compatível com EEAT em saúde.",
         backstory="Especialista em internal linking para clínicas de reabilitação; prioriza COFFITO, gov.br e pesquisas científicas.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
     agente_assinatura = Agent(
         role="Responsável por Assinatura — ITC Vertebral Jundiaí",
         goal="Anexar assinatura institucional ao final, sem alterar o conteúdo anterior.",
         backstory="Padronização profissional e acolhedora.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
     agente_revisor = Agent(
         role="Revisor Sênior — Conteúdo de Fisioterapia",
         goal="Listar melhorias em clareza, tom empático, distribuição de links, ausência de promessas e regras SEO.",
         backstory="Revisor PT-BR especializado em saúde; sem linguagem alarmista ou promessas de cura.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
     agente_executor = Agent(
         role="Executor de Revisões",
         goal="Aplicar todas as melhorias preservando estrutura semântica e linkagem.",
         backstory="Editor/Dev de HTML limpo.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     tarefa_intro = Task(

@@ -5,7 +5,9 @@ from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
-llm = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
+llm_fast     = LLM(model="gemini/gemini-2.0-flash", temperature=0.4)
 
 # -------------------------------
 # Catálogo fixo de links internos (Dr. Ricardo Vieira Ferreira — Uroclínica Jaraguá)
@@ -84,7 +86,6 @@ def build_crew_drricardo(tema: str, palavra_chave: str):
     Tom: nunca prometer resultados; sempre enfatizar avaliação médica criteriosa,
     exames laboratoriais e conduta individualizada.
     """
-    llm_local = llm
     dados_concorrencia_txt = buscar_concorrentes_serpapi_texto(palavra_chave)
     serp_struct = buscar_concorrentes_serpapi_struct(palavra_chave)
     links_internos = LINKS_INTERNOS_DRRICARDO[:]
@@ -94,55 +95,55 @@ def build_crew_drricardo(tema: str, palavra_chave: str):
         role="Redator de Introdução — Saúde Hormonal e Longevidade",
         goal="Escrever introdução formal, empática e responsável (2–3 parágrafos), citando a palavra-chave 1x, com foco em qualidade de vida e envelhecimento saudável.",
         backstory="Comunicador médico especializado em saúde hormonal; equilibra acolhimento com rigor científico e nunca faz promessas terapêuticas.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
     agente_outline = Agent(
         role="Arquiteto de Estrutura (H2/H3) — Urologia e Medicina do Envelhecimento",
         goal="Definir 5–7 H2 numerados com H3 opcionais; contemplar: o que é, sintomas, quando investigar, como funciona o diagnóstico, opções de tratamento e expectativas realistas.",
         backstory="Especialista em outline SEO para médicos; foca na dúvida do paciente que quer entender seus sintomas antes da consulta.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
     agente_desenvolvimento = Agent(
         role="Redator de Desenvolvimento — Saúde Hormonal Masculina e Feminina",
         goal="Preencher cada seção com <p> curtos e listas; cobrir: conceito, causas, sintomas, diagnóstico laboratorial, opções de tratamento, cuidados e quando buscar avaliação médica.",
         backstory="Conteúdo médico preciso e acessível; enfatiza sempre que a conduta depende de avaliação individualizada; nunca generaliza ou promete resultado.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
     agente_conclusao = Agent(
         role="Redator de Conclusão — Medicina Preventiva e Longevidade",
         goal="Encerrar com síntese objetiva e encorajamento gentil para buscar avaliação médica especializada, sem CTA comercial.",
         backstory="Foco em prevenção, autonomia e qualidade de vida ao longo do envelhecimento.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
     agente_unificador = Agent(
         role="Unificador de Conteúdo HTML",
         goal="Unir tudo em HTML único (body only), coerente, com numeração dos H2 e sem imagens.",
         backstory="Editor técnico focado em semântica e limpeza.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
     agente_linkagem = Agent(
         role="Planejador de Linkagem — Dr. Ricardo Ferreira",
         goal="Inserir links internos/externos de forma natural, distribuída e compatível com EEAT médico.",
         backstory="Especialista em internal linking para médicos; prioriza CFM, SBU, SBEM e gov.br.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
     agente_assinatura = Agent(
         role="Responsável por Assinatura — Dr. Ricardo Vieira Ferreira",
         goal="Anexar assinatura institucional ao final, sem alterar o conteúdo anterior.",
         backstory="Padronização formal e acolhedora, alinhada ao modelo de atendimento particular e exclusivo.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
     agente_revisor = Agent(
         role="Revisor Sênior — Conteúdo Médico-Hormonal",
         goal="Listar melhorias em precisão técnica, tom responsável (sem promessas), distribuição de links e SEO.",
         backstory="Revisor PT-BR especializado em medicina; zela por linguagem ética, sem afirmações absolutas de resultado.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
     agente_executor = Agent(
         role="Executor de Revisões",
         goal="Aplicar todas as melhorias preservando estrutura semântica e linkagem.",
         backstory="Editor/Dev de HTML limpo.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     tarefa_intro = Task(

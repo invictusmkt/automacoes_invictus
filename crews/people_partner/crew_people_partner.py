@@ -5,7 +5,9 @@ from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
-llm = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
+llm_fast     = LLM(model="gemini/gemini-2.0-flash", temperature=0.4)
 
 # -------------------------------
 # Catálogo fixo de links internos (People Partner)
@@ -77,7 +79,6 @@ def build_crew_peoplepartner(tema: str, palavra_chave: str):
     são as pessoas." Consultoria de RH com +100 empresas atendidas (Brasil e EUA)
     e CEO com 12+ anos de experiência.
     """
-    llm_local = llm
     dados_concorrencia_txt = buscar_concorrentes_serpapi_texto(palavra_chave)
     serp_struct = buscar_concorrentes_serpapi_struct(palavra_chave)
     links_internos = LINKS_INTERNOS_PEOPLEPARTNER[:]
@@ -87,55 +88,55 @@ def build_crew_peoplepartner(tema: str, palavra_chave: str):
         role="Redator de Introdução — Consultoria de RH e Gestão de Pessoas",
         goal="Escrever introdução profissional e empática (2–3 parágrafos), citando a palavra-chave 1x, com foco em pessoas como ativo estratégico das organizações.",
         backstory="Comunicador especializado em RH que conecta estratégia empresarial com desenvolvimento humano.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
     agente_outline = Agent(
         role="Arquiteto de Estrutura (H2/H3) — RH e Cultura Organizacional",
         goal="Definir 5–7 H2 numerados com H3 opcionais; contemplar: conceito, impacto no negócio, como implementar, erros comuns, métricas e tendências.",
         backstory="Especialista em outline SEO para consultorias; foca na dúvida do gestor de RH e do empresário.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
     agente_desenvolvimento = Agent(
         role="Redator de Desenvolvimento — Gestão de Pessoas e RH Estratégico",
         goal="Preencher cada seção com <p> curtos e listas; cobrir: conceito, benefícios, como aplicar na prática, erros, métricas de sucesso e tendências do mercado.",
         backstory="Conteúdo orientado a resultados e impacto sustentável; linguagem acessível para gestores e empresários.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
     agente_conclusao = Agent(
         role="Redator de Conclusão — RH",
         goal="Encerrar com síntese e próximos passos práticos para o gestor, sem CTA comercial.",
         backstory="Foco em ação imediata e perspectiva externa como diferencial competitivo.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
     agente_unificador = Agent(
         role="Unificador de Conteúdo HTML",
         goal="Unir tudo em HTML único (body only), coerente, com numeração dos H2 e sem imagens.",
         backstory="Editor técnico focado em semântica e limpeza.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
     agente_linkagem = Agent(
         role="Planejador de Linkagem — People Partner",
         goal="Inserir links internos/externos de forma natural e distribuída.",
         backstory="Especialista em internal linking para consultorias de RH; prioriza MTE, OIT e referências acadêmicas.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
     agente_assinatura = Agent(
         role="Responsável por Assinatura — People Partner",
         goal="Anexar assinatura institucional ao final, sem alterar o conteúdo anterior.",
         backstory="Padronização profissional e orientada a propósito.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
     agente_revisor = Agent(
         role="Revisor Sênior — Conteúdo de RH",
         goal="Listar melhorias em clareza, tom empático e estratégico, distribuição de links e SEO.",
         backstory="Revisor PT-BR; sem promessas de resultado garantido; linguagem inclusiva e orientada a dados.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
     agente_executor = Agent(
         role="Executor de Revisões",
         goal="Aplicar todas as melhorias preservando estrutura semântica e linkagem.",
         backstory="Editor/Dev de HTML limpo.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     tarefa_intro = Task(

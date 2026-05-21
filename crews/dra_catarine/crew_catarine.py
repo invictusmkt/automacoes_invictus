@@ -5,7 +5,9 @@ from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
-llm = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
+llm_fast     = LLM(model="gemini/gemini-2.0-flash", temperature=0.4)
 
 # -------------------------------
 # Catálogo fixo de links internos (Clínica Dra. Catarine Padoveze)
@@ -117,7 +119,6 @@ def build_crew_catarine(tema: str, palavra_chave: str):
     - Conclusão sem CTA comercial; CTA na assinatura ao final.
     - Linguagem técnica e serena, com foco em segurança, naturalidade, evidências e descrição clara do tratamento/jornada.
     """
-    llm_local = llm
 
     # Monta referências e links automaticamente
     dados_concorrencia_txt = buscar_concorrentes_serpapi_texto(palavra_chave)
@@ -130,63 +131,63 @@ def build_crew_catarine(tema: str, palavra_chave: str):
         role="Redator de Introdução — Clínica Boutique",
         goal="Escrever introdução clara e acolhedora (2–3 parágrafos), citando a palavra-chave 1x, com tom de autoridade e serenidade.",
         backstory="Profissional de conteúdo médico que traduz linguagem técnica em explicações compreensíveis, sem sensacionalismo.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_outline = Agent(
         role="Arquiteto de Estrutura (H2/H3) — SEO Local em Saúde",
         goal="Definir 5–7 H2 numerados, com H3 opcionais; contemplar jornada do paciente, segurança, indicações/contraindicações e resultados naturais.",
         backstory="Especialista em outline SEO para clínicas premium, foca em intenção de busca e clareza.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
 
     agente_desenvolvimento = Agent(
         role="Redator de Desenvolvimento — Dermatologia Estética",
         goal="Preencher cada seção com <p> curtos e listas, cobrindo: indicações, expectativas realistas, preparo/recuperação, segurança, evidências e resultados.",
         backstory="Conteúdo clínico orientado a paciente, sem promessas; explica benefícios, limites e métricas de satisfação/recorrência.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_conclusao = Agent(
         role="Redator de Conclusão — Próximos Passos",
         goal="Encerrar com síntese objetiva e próximos passos práticos (perguntas para levar à consulta, sinais de alerta, acompanhamento).",
         backstory="Foco em decisão informada e experiência de atendimento de alto padrão.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_unificador = Agent(
         role="Unificador de Conteúdo HTML",
         goal="Unir tudo em HTML único (apenas body), coerente, sem redundância, com numeração dos H2 e sem imagens.",
         backstory="Editor técnico focado em semântica, legibilidade e consistência.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_linkagem = Agent(
         role="Planejador e Implementador de Linkagem — Clínica",
         goal="Inserir links internos/externos de forma natural, distribuída e compatível com EEAT médico.",
         backstory="Especialista em internal linking para saúde; prioriza fontes oficiais e páginas de serviços da clínica.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_assinatura = Agent(
         role="Responsável por Assinatura — Clínica Dra. Catarine Padoveze",
         goal="Anexar assinatura institucional ao final (CTA/WhatsApp), sem alterar o conteúdo anterior.",
         backstory="Padronização elegante, linguagem respeitosa e objetiva.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_revisor = Agent(
         role="Revisor Sênior — Conteúdo Médico",
         goal="Listar melhorias objetivas (bullets) em clareza, precisão, tom médico, distribuição de links e regras SEO.",
         backstory="Revisor PT-BR; corta redundâncias; zela por conformidade e não-promessas.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
 
     agente_executor = Agent(
         role="Executor de Revisões",
         goal="Aplicar todas as melhorias preservando estrutura semântica e linkagem.",
         backstory="Editor/Dev de HTML limpo.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     # ==== Tarefas ====

@@ -4,7 +4,9 @@ from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
-llm = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
+llm_fast     = LLM(model="gemini/gemini-2.0-flash", temperature=0.4)
 
 # -------------------------------
 # Catálogo fixo de links internos (Dra. Angélica Bauer)
@@ -121,7 +123,6 @@ def build_crew_angelica(tema: str, palavra_chave: str):
     - Conclusão sem CTA comercial; CTA na assinatura ao final.
     - Foco exclusivo em dermatologia e tricologia, especialmente alopecia.
     """
-    llm_local = llm
 
     # Monta referências e links automaticamente
     dados_concorrencia_txt = buscar_concorrentes_serpapi_texto(palavra_chave)
@@ -134,63 +135,63 @@ def build_crew_angelica(tema: str, palavra_chave: str):
         role="Redator de Introdução Médica",
         goal="Escrever introdução clara, acolhedora e empática (2–3 parágrafos) no estilo médico educativo, citando a palavra‑chave 1x e focando em dermatologia/tricologia.",
         backstory="Copywriter especializado em comunicação médica; evita promessas exageradas; tom acolhedor mas científico; parágrafos curtos; sem imagens.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_outline = Agent(
         role="Arquiteto de Estrutura Médica (H2/H3) com numeração",
         goal="Definir 5–7 H2 numerados (1., 2., 3., ...), com H3 opcionais; cobrir aspectos dermatológicos/tricológicos e incluir a palavra‑chave em pelo menos um heading.",
         backstory="Especialista em estrutura de conteúdo médico; nunca usa H1; títulos específicos focados em saúde da pele e cabelos.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
 
     agente_desenvolvimento = Agent(
         role="Redator de Desenvolvimento Médico",
         goal="Preencher cada seção com <p> curtos, informações técnicas precisas, listas úteis, variar semântica da keyword sem stuffing e sem inserir imagens.",
         backstory="Conteúdo médico educativo, científico mas acessível, com foco em dermatologia e tricologia, sem promessas exageradas.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_conclusao = Agent(
         role="Redator de Conclusão Médica (sem CTA)",
         goal="Encerrar resumindo aprendizados médicos e orientações práticas sem convite comercial direto.",
         backstory="Fechamentos educativos focados em saúde e bem-estar do paciente.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_unificador = Agent(
         role="Unificador de Conteúdo HTML Médico",
         goal="Unir tudo em HTML único (apenas body), coerente, sem redundância, com numeração dos H2 e sem imagens, mantendo rigor científico.",
         backstory="Editor técnico focado em conteúdo médico, semântica e limpeza de HTML.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_linkagem = Agent(
         role="Planejador e Implementador de Linkagem Médica",
         goal="Inserir links internos/externos de forma natural e distribuída, priorizando fontes médicas autoritativas e serviços dermatológicos.",
         backstory="Especialista em EEAT médico e linkagem para autoridade em dermatologia.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_contato = Agent(
         role="Responsável por Contato e Assinatura Médica",
         goal="Anexar assinatura institucional da Dra. Angélica ao final do HTML (CTA/WhatsApp), sem alterar o conteúdo anterior.",
         backstory="Padronização e identidade institucional médica.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_revisor = Agent(
         role="Revisor Sênior Médico",
         goal="Listar melhorias objetivas (bullets) em clareza, precisão médica, gramática, distribuição de links e adequação ao público leigo.",
         backstory="Revisor PT‑BR especializado em textos médicos; corta redundâncias; mantém rigor científico acessível.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
 
     agente_executor = Agent(
         role="Executor de Revisões Médicas",
         goal="Aplicar todas as melhorias preservando estrutura semântica, linkagem e precisão médica.",
         backstory="Editor/Dev de HTML limpo especializado em conteúdo médico.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     # ==== Tarefas ====

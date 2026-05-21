@@ -4,7 +4,9 @@ from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
-llm = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
+llm_fast     = LLM(model="gemini/gemini-2.0-flash", temperature=0.4)
 
 # -------------------------------
 # Catálogo fixo de links internos (Dr. Gerson Righetto Junior)
@@ -99,7 +101,6 @@ def build_crew_gerson(tema: str, palavra_chave: str):
     - Conclusão sem CTA; CTA na assinatura ao final.
     - Tom: médico, acolhedor e baseado em evidências; foco em saúde íntima feminina, prevenção, diagnóstico precoce, tecnologias como Laser Íntimo CO₂ quando pertinente e abordagem integrativa (ginecologia + nutrologia).
     """
-    llm_local = llm
 
     # Monta referências e links automaticamente
     dados_concorrencia_txt = buscar_concorrentes_serpapi_texto(palavra_chave)
@@ -112,63 +113,63 @@ def build_crew_gerson(tema: str, palavra_chave: str):
         role="Redator de Introdução",
         goal="Escrever introdução clara, empática e precisa (2–3 parágrafos), citando a palavra-chave 1x.",
         backstory="Especialista em ginecologia e saúde da mulher; evita alarmismo; linguagem acessível.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_outline = Agent(
         role="Arquiteto de Estrutura (H2/H3) com numeração",
         goal="Definir 5–7 H2 numerados; cobrir intenção de busca; incluir a palavra-chave em pelo menos um heading.",
         backstory="Outline SEO para saúde feminina, com foco em prevenção, diagnóstico e tratamento.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
 
     agente_desenvolvimento = Agent(
         role="Redator de Desenvolvimento",
         goal="Preencher cada seção com <p> curtos e listas úteis, variar semântica da keyword sem stuffing e sem inserir imagens.",
         backstory="Explica sinais de alerta, exames (ex.: colposcopia/USG quando aplicável), nutrologia como apoio, terapias como Laser Íntimo CO₂ quando pertinente.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_conclusao = Agent(
         role="Redator de Conclusão (sem CTA)",
         goal="Encerrar resumindo aprendizados e próximos passos práticos, sem convite comercial.",
         backstory="Fechamentos naturais, objetivos e acolhedores.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_unificador = Agent(
         role="Unificador de Conteúdo HTML",
         goal="Unir tudo em HTML único (apenas body), coerente, sem redundância, com numeração dos H2 e sem imagens.",
         backstory="Editor focado em semântica, acessibilidade e limpeza de HTML.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_linkagem = Agent(
         role="Planejador e Implementador de Linkagem",
         goal="Inserir links internos/externos de forma natural e distribuída, respeitando todas as regras.",
         backstory="Especialista em internal linking e EEAT em saúde da mulher.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_contato = Agent(
         role="Responsável por Contato e Assinatura",
         goal="Anexar assinatura institucional do Dr. Gerson Righetto ao final do HTML (CTA/WhatsApp), sem alterar o conteúdo anterior.",
         backstory="Padronização e identidade médica.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_revisor = Agent(
         role="Revisor Sênior",
         goal="Listar melhorias objetivas (bullets) em clareza, gramática, tom médico, distribuição de links e regras SEO.",
         backstory="Revisor PT-BR para conteúdos médicos; elimina ambiguidades e redundâncias.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
 
     agente_executor = Agent(
         role="Executor de Revisões",
         goal="Aplicar todas as melhorias preservando estrutura semântica e linkagem.",
         backstory="Editor/Dev de HTML limpo.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     # ==== Tarefas ====

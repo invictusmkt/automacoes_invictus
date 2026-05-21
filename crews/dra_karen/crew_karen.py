@@ -4,7 +4,9 @@ from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
-llm = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
+llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
+llm_fast     = LLM(model="gemini/gemini-2.0-flash", temperature=0.4)
 
 # -------------------------------
 # Catálogo fixo de links internos (Dra. Karen Voltan)
@@ -109,7 +111,6 @@ def build_crew_karen(tema: str, palavra_chave: str):
     - Conclusão sem CTA; CTA só na assinatura final.
     - Tom informativo, responsável e empático (sem promessas de cura).
     """
-    llm_local = llm
 
     # Monta referências e links automaticamente
     dados_concorrencia_txt = buscar_concorrentes_serpapi_texto(palavra_chave)
@@ -122,63 +123,63 @@ def build_crew_karen(tema: str, palavra_chave: str):
         role="Redator de Introdução (Ortopedia Oncológica)",
         goal="Escrever introdução acolhedora (2–3 parágrafos) citando a palavra-chave 1x.",
         backstory="Copywriter sênior em saúde; linguagem acessível e responsável para pacientes oncológicos.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_outline = Agent(
         role="Arquiteto de Estrutura (H2/H3) com numeração",
         goal="Definir 5–7 H2 numerados; H3 opcionais; incluir a palavra-chave em pelo menos um heading.",
         backstory="Especialista em outline SEO em saúde; títulos específicos e éticos.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
 
     agente_desenvolvimento = Agent(
         role="Redator de Desenvolvimento (Educação em Saúde Oncológica)",
         goal="Desenvolver cada seção com <p> curtos e listas; variar semântica sem stuffing; sem imagens.",
         backstory="Produz conteúdo claro, prático e empático; sem autopromoção.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_conclusao = Agent(
         role="Redator de Conclusão (sem CTA)",
         goal="Encerrar resumindo aprendizados e próximos passos práticos.",
         backstory="Fechamentos objetivos e humanos.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     agente_unificador = Agent(
         role="Unificador de Conteúdo HTML",
         goal="Unir tudo em HTML único (apenas body), coerente, sem redundância, mantendo numeração.",
         backstory="Editor técnico focado em semântica e limpeza para WordPress.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_linkagem = Agent(
         role="Planejador e Implementador de Linkagem (EEAT/Oncologia)",
         goal="Inserir links internos/externos de forma natural e distribuída conforme regras.",
         backstory="Especialista em internal linking e autoridade clínica.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_contato = Agent(
         role="Responsável por Assinatura (Dra. Karen Voltan)",
         goal="Anexar assinatura institucional ao final do HTML (CTA/Agendamento), sem alterar o conteúdo anterior.",
         backstory="Padronização e identidade da Dra. Karen.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_fast,
     )
 
     agente_revisor = Agent(
         role="Revisor Sênior PT-BR (Oncologia)",
         goal="Listar melhorias objetivas em clareza, gramática, estilo, linkagem e SEO.",
         backstory="Revisor de saúde; corta redundâncias e mantém consistência.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_thinking,
     )
 
     agente_executor = Agent(
         role="Executor de Revisões",
         goal="Aplicar todas as melhorias preservando estrutura e linkagem.",
         backstory="Editor/Dev de HTML limpo.",
-        verbose=True, allow_delegation=False, llm=llm_local,
+        verbose=True, allow_delegation=False, llm=llm_no_think,
     )
 
     # ==== Tarefas ====
