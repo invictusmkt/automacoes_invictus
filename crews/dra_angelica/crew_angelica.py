@@ -1,11 +1,10 @@
-import os
+﻿import os
 from dotenv import load_dotenv
 from serpapi import GoogleSearch
-from crewai import Crew, Agent, Task
-from langchain_openai import ChatOpenAI
+from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
-llm = ChatOpenAI(temperature=0.4)
+llm = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
 
 # -------------------------------
 # Catálogo fixo de links internos (Dra. Angélica Bauer)
