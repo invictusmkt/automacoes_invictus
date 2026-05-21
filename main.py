@@ -13,6 +13,13 @@ from crews.dra_angelica.crew_angelica import build_crew_angelica
 from crews.dra_emmen.crew_emmen import build_crew_emmen
 from crews.dra_catarine.crew_catarine import build_crew_catarine
 from crews.clinicas_nexo.crew_clinicas_nexo import build_crew_clinicasnexo
+from crews.nippo_dents.crew_nippo_dents import build_crew_nippodents
+from crews.dra_silvia.crew_dra_silvia import build_crew_drasilvia
+from crews.dr_daniel.crew_dr_daniel import build_crew_drdaniel
+from crews.moc_advogados.crew_moc_advogados import build_crew_mocadvogados
+from crews.people_partner.crew_people_partner import build_crew_peoplepartner
+from crews.dr_ricardo.crew_dr_ricardo import build_crew_drricardo
+from crews.dr_raimundo.crew_dr_raimundo import build_crew_drraimundo
 
 
 
@@ -110,6 +117,62 @@ def executar_crew_catarine(tema: str = Query(...), palavra_chave: str = Query(..
 @app.get("/clinicas_nexo_backlink")
 def executar_crew_clinicasnexo(tema: str = Query(...), palavra_chave: str = Query(...)):
     crew = build_crew_clinicasnexo(tema, palavra_chave)
+    resultado = crew.kickoff()
+    return JSONResponse(content=resultado.model_dump())
+
+
+@app.get("/nippo_dents")
+@app.get("/nippo_dents_backlink")
+def executar_crew_nippodents(tema: str = Query(...), palavra_chave: str = Query(...)):
+    crew = build_crew_nippodents(tema, palavra_chave)
+    resultado = crew.kickoff()
+    return JSONResponse(content=resultado.model_dump())
+
+
+@app.get("/dra_silvia")
+@app.get("/dra_silvia_backlink")
+def executar_crew_drasilvia(tema: str = Query(...), palavra_chave: str = Query(...)):
+    crew = build_crew_drasilvia(tema, palavra_chave)
+    resultado = crew.kickoff()
+    return JSONResponse(content=resultado.model_dump())
+
+
+@app.get("/dr_daniel")
+@app.get("/dr_daniel_backlink")
+def executar_crew_drdaniel(tema: str = Query(...), palavra_chave: str = Query(...)):
+    crew = build_crew_drdaniel(tema, palavra_chave)
+    resultado = crew.kickoff()
+    return JSONResponse(content=resultado.model_dump())
+
+
+@app.get("/moc_advogados")
+@app.get("/moc_advogados_backlink")
+def executar_crew_mocadvogados(tema: str = Query(...), palavra_chave: str = Query(...)):
+    crew = build_crew_mocadvogados(tema, palavra_chave)
+    resultado = crew.kickoff()
+    return JSONResponse(content=resultado.model_dump())
+
+
+@app.get("/people_partner")
+@app.get("/people_partner_backlink")
+def executar_crew_peoplepartner(tema: str = Query(...), palavra_chave: str = Query(...)):
+    crew = build_crew_peoplepartner(tema, palavra_chave)
+    resultado = crew.kickoff()
+    return JSONResponse(content=resultado.model_dump())
+
+
+@app.get("/dr_raimundo")
+@app.get("/dr_raimundo_backlink")
+def executar_crew_drraimundo(tema: str = Query(...), palavra_chave: str = Query(...)):
+    crew = build_crew_drraimundo(tema, palavra_chave)
+    resultado = crew.kickoff()
+    return JSONResponse(content=resultado.model_dump())
+
+
+@app.get("/dr_ricardo")
+@app.get("/dr_ricardo_backlink")
+def executar_crew_drricardo(tema: str = Query(...), palavra_chave: str = Query(...)):
+    crew = build_crew_drricardo(tema, palavra_chave)
     resultado = crew.kickoff()
     return JSONResponse(content=resultado.model_dump())
 
