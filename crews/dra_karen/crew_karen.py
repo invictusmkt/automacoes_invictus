@@ -6,7 +6,7 @@ from crewai import Crew, Agent, Task, LLM
 load_dotenv()
 llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
 llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
-llm_fast     = LLM(model="gemini/gemini-2.0-flash", temperature=0.4)
+llm_fast     = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
 
 # -------------------------------
 # Catálogo fixo de links internos (Dra. Karen Voltan)
