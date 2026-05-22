@@ -166,6 +166,9 @@ Concorrência:\n{dados_concorrencia_txt}""".strip(),
 Crie a ESTRUTURA para '{tema}': 5–7 <h2> numerados, até 2 <h3> por seção.
 Inclua H2 sobre "Diagnóstico: como é feito", H2 "Opções de tratamento: conservador vs cirúrgico" e H2 "Recuperação e prognóstico".
 Pelo menos 1 heading com '{palavra_chave}'. Nunca <h1>. Só headings.
+- Alinhar os H2 com a intenção de busca: responder diretamente o que o usuário quer saber sobre o tema.
+- Trabalhar entidades semânticas: incluir nos headings termos correlatos, sinônimos e subtemas que reforcem a autoridade temática.
+
 Concorrência:\n{dados_concorrencia_txt}""".strip(),
         expected_output="Lista hierárquica com <h2> numerados.",
         agent=agente_outline
@@ -175,6 +178,13 @@ Concorrência:\n{dados_concorrencia_txt}""".strip(),
 Desenvolva o CORPO (mín. 1200 palavras): <p> curtos, <ul><li> quando listar.
 Cubra: anatomia relevante, causas/fatores de risco, sintomas, diagnóstico (clínico + imagem), tratamento conservador, indicação cirúrgica, técnicas disponíveis, recuperação e quando procurar especialista.
 Variar semântica de '{palavra_chave}' sem stuffing. Zero imagens. Zero CTA.
+Diretrizes de qualidade obrigatórias:
+- SEO local: inserir cidade/bairro/região do cliente de forma natural (mínimo 2 menções no corpo).
+- Conexão com serviço: mencionar como o tema se relaciona ao serviço/especialidade real do cliente.
+- Profundidade: incluir causas, sinais, critérios de avaliação, exemplos práticos e orientações concretas. Evitar generalidades vagas.
+- Semântica/entidades: usar variações e termos correlatos à keyword (sinônimos, subtemas, entidades do domínio).
+- Linguagem ética: evitar tom de diagnóstico, promessa de resultado ou urgência. Usar "pode estar associado", "a avaliação profissional é recomendada".
+
 Concorrência:\n{dados_concorrencia_txt}""".strip(),
         expected_output="HTML com <h2> numerados, <h3>, <p> e <ul><li>.",
         agent=agente_desenvolvimento
@@ -214,6 +224,16 @@ Anexe ao FINAL do HTML a assinatura do Dr. Daniel Rebolledo:
     tarefa_revisar = Task(
         description=f"""
 Revise: ortografia PT-BR, precisão técnica, tom humanizado, H2 numerados, distribuição de links, ausência de promessas e de imagens/<h1>.
+Checklist de qualidade obrigatório — verificar TODOS os itens antes de finalizar:
+- CTA ético: evitar "agende agora", "não adie", "invista na sua saúde", "transformação". Preferir linguagem educativa e neutra.
+- Assinatura: está personalizada e profissional (com CRM/CREFITO/OAB quando aplicável)?
+- Linguagem ética: ausência de promessas de resultado, tom de diagnóstico ou urgência. Usar "pode estar associado", "a avaliação profissional é recomendada", "a conduta depende do caso".
+- SEO local: cidade/bairro/região do cliente aparecem de forma natural no corpo (mínimo 2 ocorrências)?
+- Conexão com serviço: o artigo conecta o tema ao serviço/especialidade real do cliente?
+- Profundidade: há causas, sinais, critérios de avaliação, exemplos práticos e orientações concretas?
+- Intenção de busca: os H2s respondem ao que o usuário busca? Alinhamento com a palavra-chave e entidades do tema?
+- Links internos: levam a páginas reais e relevantes? Âncoras descritivas (nunca "clique aqui")?
+
 Saída: bullets JSON-like: {{"campo":"...","problema":"...","acao":"..."}}""".strip(),
         expected_output="Bullets com melhorias acionáveis.",
         agent=agente_revisor

@@ -218,6 +218,9 @@ Crie a ESTRUTURA (apenas headings) para '{tema}' no estilo médico ginecológico
 - Títulos específicos, claros e focados em aspectos ginecológicos/obstétricos.
 - Nunca usar <h1>. Não incluir conteúdo; só <h2>/<h3>.
 - Abordar causas, sintomas, tratamentos ginecológicos e prevenção quando aplicável.
+- Alinhar os H2 com a intenção de busca: responder diretamente o que o usuário quer saber sobre o tema.
+- Trabalhar entidades semânticas: incluir nos headings termos correlatos, sinônimos e subtemas que reforcem a autoridade temática.
+
 Baseie a cobertura na intenção de busca médica ginecológica e em lacunas/oportunidades dos concorrentes:
 {dados_concorrencia_txt}
 """.strip(),
@@ -238,6 +241,13 @@ Desenvolva o CORPO a partir dos H2/H3 definidos, mantendo a numeração dos H2:
 - PROIBIDO inserir imagens.
 - Não inventar novos headings; usar apenas os fornecidos.
 - Quando fizer sentido, inclua links internos naturais no corpo (anchors descritivas).
+Diretrizes de qualidade obrigatórias:
+- SEO local: inserir cidade/bairro/região do cliente de forma natural (mínimo 2 menções no corpo).
+- Conexão com serviço: mencionar como o tema se relaciona ao serviço/especialidade real do cliente.
+- Profundidade: incluir causas, sinais, critérios de avaliação, exemplos práticos e orientações concretas. Evitar generalidades vagas.
+- Semântica/entidades: usar variações e termos correlatos à keyword (sinônimos, subtemas, entidades do domínio).
+- Linguagem ética: evitar tom de diagnóstico, promessa de resultado ou urgência. Usar "pode estar associado", "a avaliação profissional é recomendada".
+
 Concorrência (inspiração – NÃO copiar):
 {dados_concorrencia_txt}
 """.strip(),
@@ -326,6 +336,16 @@ Revise o HTML final quanto a:
 - Coerência científica e distribuição de links; âncoras descritivas; ausência de overstuffing de '{palavra_chave}'.
 - Adequação ao público leigo interessado em saúde ginecológica/obstétrica.
 - Respeito às proibições de imagens e de <h1>.
+Checklist de qualidade obrigatório — verificar TODOS os itens antes de finalizar:
+- CTA ético: evitar "agende agora", "não adie", "invista na sua saúde", "transformação". Preferir linguagem educativa e neutra.
+- Assinatura: está personalizada e profissional (com CRM/CREFITO/OAB quando aplicável)?
+- Linguagem ética: ausência de promessas de resultado, tom de diagnóstico ou urgência. Usar "pode estar associado", "a avaliação profissional é recomendada", "a conduta depende do caso".
+- SEO local: cidade/bairro/região do cliente aparecem de forma natural no corpo (mínimo 2 ocorrências)?
+- Conexão com serviço: o artigo conecta o tema ao serviço/especialidade real do cliente?
+- Profundidade: há causas, sinais, critérios de avaliação, exemplos práticos e orientações concretas?
+- Intenção de busca: os H2s respondem ao que o usuário busca? Alinhamento com a palavra-chave e entidades do tema?
+- Links internos: levam a páginas reais e relevantes? Âncoras descritivas (nunca "clique aqui")?
+
 Saída: lista de melhorias acionáveis em bullets JSON‑like:
 - {{"campo":"trecho/resumo","problema":"...","acao":"..."}}
 """.strip(),
