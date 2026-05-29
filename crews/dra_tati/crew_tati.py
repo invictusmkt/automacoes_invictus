@@ -240,6 +240,9 @@ Crie a ESTRUTURA (apenas headings) para '{tema}':
 - Pelo menos UM heading deve conter a palavra‑chave '{palavra_chave}' de forma natural.
 - Incluir um H2 de "Erros comuns e armadilhas" e outro de "Exemplos práticos / aplicação".
 - Nunca usar <h1>. Não incluir conteúdo; só <h2>/<h3>.
+- Alinhar os H2 com a intenção de busca: responder diretamente o que o usuário quer saber sobre o tema.
+- Trabalhar entidades semânticas: incluir nos headings termos correlatos, sinônimos e subtemas que reforcem a autoridade temática.
+
 Baseie a cobertura na intenção de busca do paciente e lacunas dos concorrentes:
 {dados_concorrencia_txt}
 """.strip(),
@@ -342,6 +345,16 @@ Revise o HTML final quanto a:
 - Estilo: H2 numerados, parágrafos curtos, listas quando úteis, distribuição de links.
 - Coerência e distribuição de links; âncoras descritivas; ausência de overstuffing de '{palavra_chave}'.
 - Respeito às proibições de imagens e de <h1>.
+Checklist de qualidade obrigatório — verificar TODOS os itens antes de finalizar:
+- CTA ético: evitar "agende agora", "não adie", "invista na sua saúde", "transformação". Preferir linguagem educativa e neutra.
+- Assinatura: está personalizada e profissional (com CRM/CREFITO/OAB quando aplicável)?
+- Linguagem ética: ausência de promessas de resultado, tom de diagnóstico ou urgência. Usar "pode estar associado", "a avaliação profissional é recomendada", "a conduta depende do caso".
+- SEO local: cidade/bairro/região do cliente aparecem de forma natural no corpo (mínimo 2 ocorrências)?
+- Conexão com serviço: o artigo conecta o tema ao serviço/especialidade real do cliente?
+- Profundidade: há causas, sinais, critérios de avaliação, exemplos práticos e orientações concretas?
+- Intenção de busca: os H2s respondem ao que o usuário busca? Alinhamento com a palavra-chave e entidades do tema?
+- Links internos: levam a páginas reais e relevantes? Âncoras descritivas (nunca "clique aqui")?
+
 Saída: lista de melhorias acionáveis em bullets JSON‑like:
 - {{"campo":"trecho/resumo","problema":"...","acao":"..."}}
 """.strip(),

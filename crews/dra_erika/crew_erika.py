@@ -136,6 +136,13 @@ Considere este resumo da concorrência:\n\n{dados_concorrencia}""",
 
         Task(
             description=f"""Desenvolva parágrafos <p> e listas <ul><li> com base nos subtítulos sobre '{tema}', explicando tratamentos, tecnologias e cuidados recomendados.
+Diretrizes de qualidade obrigatórias:
+- SEO local: inserir cidade/bairro/região do cliente de forma natural (mínimo 2 menções no corpo).
+- Conexão com serviço: mencionar como o tema se relaciona ao serviço/especialidade real do cliente.
+- Profundidade: incluir causas, sinais, critérios de avaliação, exemplos práticos e orientações concretas. Evitar generalidades vagas.
+- Semântica/entidades: usar variações e termos correlatos à keyword (sinônimos, subtemas, entidades do domínio).
+- Linguagem ética: evitar tom de diagnóstico, promessa de resultado ou urgência. Usar "pode estar associado", "a avaliação profissional é recomendada".
+
 Considere este resumo da concorrência:\n\n{dados_concorrencia}""",
             expected_output="Conteúdo em HTML detalhado, claro e técnico.",
             agent=agente_meio_lista
@@ -168,7 +175,18 @@ Baseie-se neste resumo da concorrência:\n\n{dados_concorrencia}""",
         ),
 
         Task(
-            description="Revisar o conteúdo com foco em clareza técnica, tom acolhedor e consistência com a comunicação da Dra. Erika.",
+            description=(
+            "Revise o conteúdo quanto a:\n"
+            "- Ortografia/gramática PT-BR; clareza; tom acolhedor e técnico.\n"
+            "- CTA ético: evitar agende agora, não adie, invista na sua saúde. Preferir linguagem educativa.\n"
+            "- Assinatura personalizada e profissional (com CRM/CREFITO quando aplicável).\n"
+            "- Linguagem ética: ausência de promessas, diagnóstico ou urgência.\n"
+            "- SEO local: cidade/bairro do cliente aparece de forma natural no corpo (mínimo 2x)?\n"
+            "- Conexão com serviço: o artigo conecta o tema à atuação real da Dra. Erika?\n"
+            "- Profundidade: causas, sinais, exemplos práticos e orientações concretas?\n"
+            "- Links reais e relevantes? Âncoras descritivas (nunca clique aqui)?\n"
+            "Saída: lista de melhorias acionáveis em bullets."
+        ),
             expected_output="Lista de ajustes e sugestões.",
             agent=agente_revisor
         ),
