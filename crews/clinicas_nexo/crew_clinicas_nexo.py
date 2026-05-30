@@ -5,6 +5,29 @@ from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
+
+# ── Configuração do cliente ───────────────────────────────────────────────────
+CLIENTE = {
+    "nome":          "Nexo - Instituto de Psicologia Aplicada",
+    "especialidade": "Psicologia e Saúde Mental",
+    "credenciais":   "",
+    "cidade":        "Americana",
+    "estado":        "SP",
+    "bairro":        "",
+    "servicos":      [
+        "psicoterapia individual (infantil, adolescentes, adultos e idosos)",
+        "atendimento especializado em TEA/ABA",
+        "avaliação neuropsicológica",
+        "fonoaudiologia e terapia ocupacional",
+        "parcerias corporativas de saúde mental",
+    ],
+    "publico":       "crianças, adolescentes, adultos, idosos, pessoas com TEA/TDAH, empresas e profissionais da psicologia",
+    "diferencial":   "referência em intervenção ABA para autismo e atendimento multidisciplinar integrado no interior de SP (Americana, Campinas, Piracicaba)",
+    "segmento":      "saúde",
+    "assinatura":    "Nexo — Instituto de Psicologia Aplicada em Americana/SP e Região",
+}
+_localidade = "Americana/SP e Região Metropolitana de Campinas"
+_servicos_resumo = " | ".join(CLIENTE["servicos"][:4])
 llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
 llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
 llm_fast     = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
@@ -265,8 +288,8 @@ Desenvolva o CORPO a partir dos H2/H3 definidos, mantendo a numeração dos H2:
 - Não inventar novos headings; usar apenas os fornecidos.
 - Quando fizer sentido, inclua links internos naturais no corpo (anchors descritivas).
 Diretrizes de qualidade obrigatórias:
-- SEO local: inserir cidade/bairro/região do cliente de forma natural (mínimo 2 menções no corpo).
-- Conexão com serviço: mencionar como o tema se relaciona ao serviço/especialidade real do cliente.
+- SEO local: inserir de forma natural "{_localidade}" no corpo do texto (mínimo 2 menções). Evitar repetição artificial.
+- Conexão com serviço: conectar o tema aos serviços reais do cliente — {_servicos_resumo}.
 - Profundidade: incluir causas, sinais, critérios de avaliação, exemplos práticos e orientações concretas. Evitar generalidades vagas.
 - Semântica/entidades: usar variações e termos correlatos à keyword (sinônimos, subtemas, entidades do domínio).
 - Linguagem ética: evitar tom de diagnóstico, promessa de resultado ou urgência. Usar "pode estar associado", "a avaliação profissional é recomendada".

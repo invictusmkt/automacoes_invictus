@@ -5,6 +5,29 @@ from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
+
+# ── Configuração do cliente ───────────────────────────────────────────────────
+CLIENTE = {
+    "nome":          "MOC | Martins, Oliveira & Cruz Advogados",
+    "especialidade": "Escritório de Advocacia",
+    "credenciais":   "",
+    "cidade":        "São José do Rio Preto",
+    "estado":        "SP",
+    "bairro":        "Jardim Maracanã",
+    "servicos":      [
+        "assessoria jurídica empresarial por assinatura",
+        "planejamento tributário e recuperação de créditos",
+        "defesa trabalhista para bancários",
+        "planejamento previdenciário (INSS)",
+        "negativas de planos de saúde",
+    ],
+    "publico":       "empresas em busca de gestão de risco jurídico e pessoas físicas em demandas trabalhistas, de saúde ou previdenciárias",
+    "diferencial":   "suporte jurídico contemporâneo altamente especializado com atuação em São José do Rio Preto, Santos e Marília/SP",
+    "segmento":      "jurídico",
+    "assinatura":    "Martins, Oliveira & Cruz Advogados — Advocacia Contemporânea em São José do Rio Preto, Santos e Marília/SP",
+}
+_localidade = "São José do Rio Preto, Santos e Marília/SP"
+_servicos_resumo = " | ".join(CLIENTE["servicos"][:4])
 llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
 llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
 llm_fast     = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
@@ -173,8 +196,8 @@ Desenvolva o CORPO (mín. 1200 palavras): <p> curtos, <ul><li> quando listar.
 Cubra: conceito legal, base normativa (cite leis e artigos quando relevante), direitos, deveres, prazos, como agir na prática e prevenção de riscos.
 Variar semântica de '{palavra_chave}' sem stuffing. Zero imagens. Zero CTA. Nunca prometer resultado.
 Diretrizes de qualidade obrigatórias:
-- SEO local: inserir cidade/bairro/região do cliente de forma natural (mínimo 2 menções no corpo).
-- Conexão com serviço: mencionar como o tema se relaciona ao serviço/especialidade real do cliente.
+- SEO local: inserir de forma natural "{_localidade}" no corpo do texto (mínimo 2 menções). Evitar repetição artificial.
+- Conexão com serviço: conectar o tema aos serviços reais do cliente — {_servicos_resumo}.
 - Profundidade: incluir causas, sinais, critérios de avaliação, exemplos práticos e orientações concretas. Evitar generalidades vagas.
 - Semântica/entidades: usar variações e termos correlatos à keyword (sinônimos, subtemas, entidades do domínio).
 - Linguagem ética: evitar tom de diagnóstico, promessa de resultado ou urgência. Usar "pode estar associado", "a avaliação profissional é recomendada".

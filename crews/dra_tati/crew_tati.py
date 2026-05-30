@@ -4,6 +4,28 @@ from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
+
+# ── Configuração do cliente ───────────────────────────────────────────────────
+CLIENTE = {
+    "nome":          "Dra. Tatiana Villas Boas Gabbi",
+    "especialidade": "Médica Dermatologista",
+    "credenciais":   "CRM-SP 104415 | RQE 31137",
+    "cidade":        "São Paulo",
+    "estado":        "SP",
+    "bairro":        "Itaim Bibi",
+    "servicos":      [
+        "tratamento de doenças das unhas (onicopatias)",
+        "queda de cabelo (tricologia)",
+        "tratamentos dermatológicos para pele",
+        "cirurgia ungueal",
+    ],
+    "publico":       "pessoas com patologias de unhas, cabelos e pele em busca de diagnóstico e tratamento especializado",
+    "diferencial":   "referência nacional e internacional em doenças das unhas (onicopatias), formada pela USP e membro da European Nail Society",
+    "segmento":      "saúde",
+    "assinatura":    "Dra. Tatiana Villas Boas Gabbi — Dermatologista em São Paulo/SP | CRM-SP 104415 | RQE 31137",
+}
+_localidade = (CLIENTE["bairro"] + ", " if CLIENTE["bairro"] else "") + CLIENTE["cidade"] + "/" + CLIENTE["estado"]
+_servicos_resumo = " | ".join(CLIENTE["servicos"][:4])
 llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
 llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
 llm_fast     = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
@@ -349,7 +371,7 @@ Checklist de qualidade obrigatório — verificar TODOS os itens antes de finali
 - CTA ético: evitar "agende agora", "não adie", "invista na sua saúde", "transformação". Preferir linguagem educativa e neutra.
 - Assinatura: está personalizada e profissional (com CRM/CREFITO/OAB quando aplicável)?
 - Linguagem ética: ausência de promessas de resultado, tom de diagnóstico ou urgência. Usar "pode estar associado", "a avaliação profissional é recomendada", "a conduta depende do caso".
-- SEO local: cidade/bairro/região do cliente aparecem de forma natural no corpo (mínimo 2 ocorrências)?
+- SEO local: "{_localidade}" aparece de forma natural no corpo do texto (mínimo 2 ocorrências)?
 - Conexão com serviço: o artigo conecta o tema ao serviço/especialidade real do cliente?
 - Profundidade: há causas, sinais, critérios de avaliação, exemplos práticos e orientações concretas?
 - Intenção de busca: os H2s respondem ao que o usuário busca? Alinhamento com a palavra-chave e entidades do tema?

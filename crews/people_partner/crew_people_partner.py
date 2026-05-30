@@ -5,6 +5,29 @@ from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
+
+# ── Configuração do cliente ───────────────────────────────────────────────────
+CLIENTE = {
+    "nome":          "People Partner",
+    "especialidade": "Consultoria de Recursos Humanos e Gestão de Pessoas",
+    "credenciais":   "",
+    "cidade":        "Belo Horizonte",
+    "estado":        "MG",
+    "bairro":        "",
+    "servicos":      [
+        "HR as a Service (RH como serviço)",
+        "estruturação e aprimoramento de processos internos de RH",
+        "recrutamento e seleção de talentos",
+        "programas de mentoria corporativa e individual",
+        "estratégias de engajamento e retenção profissional",
+    ],
+    "publico":       "empresas de pequeno e médio porte que desejam implantar ou aprimorar RH estratégico, e profissionais em transição",
+    "diferencial":   "consultoria imparcial pioneira no modelo HR as a Service, focada em maximizar o potencial humano como motor de crescimento das empresas",
+    "segmento":      "corporativo",
+    "assinatura":    "People Partner — Recursos Humanos e Gestão de Pessoas | HR as a Service",
+}
+_localidade = CLIENTE["cidade"] + "/" + CLIENTE["estado"]
+_servicos_resumo = " | ".join(CLIENTE["servicos"][:4])
 llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
 llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
 llm_fast     = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
@@ -167,8 +190,8 @@ Desenvolva o CORPO (mín. 1200 palavras): <p> curtos, <ul><li> quando listar.
 Cubra: conceito e por que importa para o negócio, como implementar passo a passo, erros comuns, métricas de sucesso, tendências e dicas práticas para gestores.
 Variar semântica de '{palavra_chave}' sem stuffing. Zero imagens. Zero CTA.
 Diretrizes de qualidade obrigatórias:
-- SEO local: inserir cidade/bairro/região do cliente de forma natural (mínimo 2 menções no corpo).
-- Conexão com serviço: mencionar como o tema se relaciona ao serviço/especialidade real do cliente.
+- SEO local: inserir de forma natural "{_localidade}" no corpo do texto (mínimo 2 menções). Evitar repetição artificial.
+- Conexão com serviço: conectar o tema aos serviços reais do cliente — {_servicos_resumo}.
 - Profundidade: incluir causas, sinais, critérios de avaliação, exemplos práticos e orientações concretas. Evitar generalidades vagas.
 - Semântica/entidades: usar variações e termos correlatos à keyword (sinônimos, subtemas, entidades do domínio).
 - Linguagem ética: evitar tom de diagnóstico, promessa de resultado ou urgência. Usar "pode estar associado", "a avaliação profissional é recomendada".
