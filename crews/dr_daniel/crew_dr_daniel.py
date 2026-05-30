@@ -5,6 +5,28 @@ from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
+
+# ── Configuração do cliente ───────────────────────────────────────────────────
+CLIENTE = {
+    "nome":          "Dr. Daniel César Seguel Rebolledo",
+    "especialidade": "Ortopedista e Traumatologista (Cirurgia do Quadril e Oncologia Ortopédica)",
+    "credenciais":   "CRM-SP 104291 | RQE 10207",
+    "cidade":        "São Paulo",
+    "estado":        "SP",
+    "bairro":        "",
+    "servicos":      [
+        "cirurgia do quadril (artroplastia/prótese de quadril)",
+        "tratamento de tumores ósseos e de partes moles",
+        "viscossuplementação e infiltrações no quadril",
+        "artroscopia de quadril",
+    ],
+    "publico":       "pacientes com dores, lesões ou fraturas no quadril e pessoas com suspeita ou diagnóstico de tumores ósseos",
+    "diferencial":   "dupla especialidade (Quadril e Oncologia Ortopédica), formado pela USP, aliando técnicas cirúrgicas modernas a atendimento humanizado",
+    "segmento":      "saúde",
+    "assinatura":    "Dr. Daniel César Seguel Rebolledo — Cirurgia do Quadril e Oncologia Ortopédica | CRM-SP 104291 | RQE 10207",
+}
+_localidade = "São Paulo/SP e Grande ABC"
+_servicos_resumo = " | ".join(CLIENTE["servicos"][:4])
 llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
 llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
 llm_fast     = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
@@ -179,8 +201,8 @@ Desenvolva o CORPO (mín. 1200 palavras): <p> curtos, <ul><li> quando listar.
 Cubra: anatomia relevante, causas/fatores de risco, sintomas, diagnóstico (clínico + imagem), tratamento conservador, indicação cirúrgica, técnicas disponíveis, recuperação e quando procurar especialista.
 Variar semântica de '{palavra_chave}' sem stuffing. Zero imagens. Zero CTA.
 Diretrizes de qualidade obrigatórias:
-- SEO local: inserir cidade/bairro/região do cliente de forma natural (mínimo 2 menções no corpo).
-- Conexão com serviço: mencionar como o tema se relaciona ao serviço/especialidade real do cliente.
+- SEO local: inserir de forma natural "{_localidade}" no corpo do texto (mínimo 2 menções). Evitar repetição artificial.
+- Conexão com serviço: conectar o tema aos serviços reais do cliente — {_servicos_resumo}.
 - Profundidade: incluir causas, sinais, critérios de avaliação, exemplos práticos e orientações concretas. Evitar generalidades vagas.
 - Semântica/entidades: usar variações e termos correlatos à keyword (sinônimos, subtemas, entidades do domínio).
 - Linguagem ética: evitar tom de diagnóstico, promessa de resultado ou urgência. Usar "pode estar associado", "a avaliação profissional é recomendada".

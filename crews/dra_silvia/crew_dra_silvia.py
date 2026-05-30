@@ -5,6 +5,28 @@ from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
+
+# ── Configuração do cliente ───────────────────────────────────────────────────
+CLIENTE = {
+    "nome":          "ITC Vertebral Jundiaí (Dra. Sílvia Canevari)",
+    "especialidade": "Fisioterapia Especializada em Coluna Vertebral",
+    "credenciais":   "CREFITO 8801-F",
+    "cidade":        "Jundiaí",
+    "estado":        "SP",
+    "bairro":        "Jardim Brasil",
+    "servicos":      [
+        "tratamento não cirúrgico de hérnia de disco e dor ciática",
+        "reabilitação de artrose, dor lombar e dor cervical",
+        "programa de reconstrução músculo-articular (RMA da coluna)",
+        "quiroprática e osteopatia",
+    ],
+    "publico":       "pessoas com dores, lesões ou patologias na coluna que buscam tratamentos eficazes e não invasivos",
+    "diferencial":   "método exclusivo RMA (Reconstrução Músculo Articular), tecnologia avançada (mesas de tração eletrônicas) e direção da Dra. Sílvia Canevari",
+    "segmento":      "saúde",
+    "assinatura":    "ITC Vertebral Jundiaí — Fisioterapia Especializada na Coluna em Jundiaí/SP | CREFITO 8801-F",
+}
+_localidade = (CLIENTE["bairro"] + ", " if CLIENTE["bairro"] else "") + CLIENTE["cidade"] + "/" + CLIENTE["estado"]
+_servicos_resumo = " | ".join(CLIENTE["servicos"][:4])
 llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
 llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
 llm_fast     = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
@@ -163,8 +185,8 @@ Desenvolva o CORPO (mín. 1200 palavras): <p> curtos, <ul><li> quando listar.
 Cubra: causas, sintomas, diagnóstico clínico, protocolo de fisioterapia, exercícios indicados, cuidados do dia a dia, quando a cirurgia é realmente necessária.
 Variar semântica de '{palavra_chave}' sem stuffing. Zero imagens. Zero CTA.
 Diretrizes de qualidade obrigatórias:
-- SEO local: inserir cidade/bairro/região do cliente de forma natural (mínimo 2 menções no corpo).
-- Conexão com serviço: mencionar como o tema se relaciona ao serviço/especialidade real do cliente.
+- SEO local: inserir de forma natural "{_localidade}" no corpo do texto (mínimo 2 menções). Evitar repetição artificial.
+- Conexão com serviço: conectar o tema aos serviços reais do cliente — {_servicos_resumo}.
 - Profundidade: incluir causas, sinais, critérios de avaliação, exemplos práticos e orientações concretas. Evitar generalidades vagas.
 - Semântica/entidades: usar variações e termos correlatos à keyword (sinônimos, subtemas, entidades do domínio).
 - Linguagem ética: evitar tom de diagnóstico, promessa de resultado ou urgência. Usar "pode estar associado", "a avaliação profissional é recomendada".

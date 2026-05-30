@@ -5,6 +5,29 @@ from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
+
+# ── Configuração do cliente ───────────────────────────────────────────────────
+CLIENTE = {
+    "nome":          "Nippo Dents Odontologia",
+    "especialidade": "Clínica Odontológica",
+    "credenciais":   "",
+    "cidade":        "São Paulo",
+    "estado":        "SP",
+    "bairro":        "São Judas / Saúde",
+    "servicos":      [
+        "ortodontia geral e estética (Invisalign)",
+        "implantes dentários e prótese protocolo",
+        "odontologia miofuncional (Myobrace)",
+        "harmonização orofacial",
+        "sedação consciente para pacientes com fobia/medo",
+    ],
+    "publico":       "crianças, adultos e idosos em busca de cuidados odontológicos completos e especializados",
+    "diferencial":   "mais de 25 anos de atuação, pioneira em odontologia miofuncional, sedação consciente para fobia e estrutura completa próximo ao metrô São Judas",
+    "segmento":      "saúde",
+    "assinatura":    "Nippo Dents Odontologia — Clínica Odontológica em São Paulo/SP",
+}
+_localidade = (CLIENTE["bairro"] + ", " if CLIENTE["bairro"] else "") + CLIENTE["cidade"] + "/" + CLIENTE["estado"]
+_servicos_resumo = " | ".join(CLIENTE["servicos"][:4])
 llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
 llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
 llm_fast     = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
@@ -180,8 +203,8 @@ Desenvolva o CORPO (mín. 1200 palavras): <p> curtos, <ul><li> quando listar.
 Cubra: o que é, indicações, tecnologia, processo, cuidados pós, expectativas realistas.
 Variar semântica de '{palavra_chave}' sem stuffing. Zero imagens. Zero CTA.
 Diretrizes de qualidade obrigatórias:
-- SEO local: inserir cidade/bairro/região do cliente de forma natural (mínimo 2 menções no corpo).
-- Conexão com serviço: mencionar como o tema se relaciona ao serviço/especialidade real do cliente.
+- SEO local: inserir de forma natural "{_localidade}" no corpo do texto (mínimo 2 menções). Evitar repetição artificial.
+- Conexão com serviço: conectar o tema aos serviços reais do cliente — {_servicos_resumo}.
 - Profundidade: incluir causas, sinais, critérios de avaliação, exemplos práticos e orientações concretas. Evitar generalidades vagas.
 - Semântica/entidades: usar variações e termos correlatos à keyword (sinônimos, subtemas, entidades do domínio).
 - Linguagem ética: evitar tom de diagnóstico, promessa de resultado ou urgência. Usar "pode estar associado", "a avaliação profissional é recomendada".

@@ -5,6 +5,28 @@ from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
+
+# ── Configuração do cliente ───────────────────────────────────────────────────
+CLIENTE = {
+    "nome":          "Dr. Ricardo Vieira Ferreira",
+    "especialidade": "Médico Urologista e Reposição Hormonal",
+    "credenciais":   "CRM-SC 13164 | RQE Urologia 9029 | RQE Acupuntura 23022",
+    "cidade":        "Jaraguá do Sul",
+    "estado":        "SC",
+    "bairro":        "",
+    "servicos":      [
+        "reposição hormonal masculina e feminina",
+        "implantes hormonais",
+        "tratamento urológico geral (andrologia, litíase renal, urologia feminina)",
+        "saúde metabólica e controle de peso",
+    ],
+    "publico":       "homens e mulheres que buscam equilíbrio hormonal, melhora da disposição e envelhecimento saudável",
+    "diferencial":   "médico urologista com mais de 35 anos de experiência, unindo urologia, acupuntura e medicina integrativa",
+    "segmento":      "saúde",
+    "assinatura":    "Dr. Ricardo Vieira Ferreira — Reposição Hormonal e Urologia em Jaraguá do Sul/SC | CRM-SC 13164 | RQE 9029",
+}
+_localidade = (CLIENTE["bairro"] + ", " if CLIENTE["bairro"] else "") + CLIENTE["cidade"] + "/" + CLIENTE["estado"]
+_servicos_resumo = " | ".join(CLIENTE["servicos"][:4])
 llm_thinking = LLM(model="gemini/gemini-2.5-flash", temperature=0.4)
 llm_no_think = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
 llm_fast     = LLM(model="gemini/gemini-2.5-flash", temperature=0.4, thinking={"type": "disabled"})
@@ -175,8 +197,8 @@ Cubra: o que é, causas e fatores de risco, sintomas, diagnóstico laboratorial 
 Sempre usar "pode contribuir", "em alguns casos", "dependendo da avaliação clínica" — nunca prometer resultado.
 Variar semântica de '{palavra_chave}' sem stuffing. Zero imagens. Zero CTA.
 Diretrizes de qualidade obrigatórias:
-- SEO local: inserir cidade/bairro/região do cliente de forma natural (mínimo 2 menções no corpo).
-- Conexão com serviço: mencionar como o tema se relaciona ao serviço/especialidade real do cliente.
+- SEO local: inserir de forma natural "{_localidade}" no corpo do texto (mínimo 2 menções). Evitar repetição artificial.
+- Conexão com serviço: conectar o tema aos serviços reais do cliente — {_servicos_resumo}.
 - Profundidade: incluir causas, sinais, critérios de avaliação, exemplos práticos e orientações concretas. Evitar generalidades vagas.
 - Semântica/entidades: usar variações e termos correlatos à keyword (sinônimos, subtemas, entidades do domínio).
 - Linguagem ética: evitar tom de diagnóstico, promessa de resultado ou urgência. Usar "pode estar associado", "a avaliação profissional é recomendada".
