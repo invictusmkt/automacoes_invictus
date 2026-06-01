@@ -7,14 +7,8 @@ from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
 
-# ── Diretriz reutilizável de uso da palavra-chave (anti-stuffing) ──────────────
-REGRA_KEYWORD = (
-    "Uso da palavra-chave: ela pode (e deve) ser flexionada, reordenada ou "
-    "parcialmente reescrita para soar 100% natural na frase. NUNCA insira a frase "
-    "exata da palavra-chave como bloco isolado, com inicial maiúscula forçada, nem "
-    "destacada em <em>/<strong>. No máximo 1 menção próxima à forma exata em todo o "
-    "texto; as demais devem ser variações semânticas e sinônimos."
-)
+# ── Diretriz e faxina compartilhadas (ver crews/_common.py) ────────────────────
+from crews._common import REGRA_KEYWORD, sanitizar_links as _sanitizar_base
 
 # ── Configuração do cliente ───────────────────────────────────────────────────
 CLIENTE = {
@@ -96,59 +90,9 @@ ENDERECOS_DRRAIMUNDO = (
 )
 
 
-def _normalizar_url(url: str) -> str:
-    return (url or "").strip().rstrip("/").lower()
-
-
 def sanitizar_links(html: str) -> str:
-    """Defesa determinística contra links quebrados/inventados.
-
-    Varre todas as tags <a> do HTML final e, para cada href que NÃO esteja no
-    catálogo interno, na whitelist de autoridades externas ou no WhatsApp oficial,
-    remove o link preservando o texto da âncora (faz unwrap). Elimina URLs
-    relativas (/...) e páginas inventadas pelo modelo.
-    """
-    if not html:
-        return html
-
-    # 1) Se houver blocos cercados (```html ... ```), mantém só o conteúdo do
-    #    ÚLTIMO bloco. O modelo às vezes vaza raciocínio (com exemplos cercados)
-    #    antes da resposta final — a resposta real é sempre o último bloco.
-    if "```" in html:
-        segmentos = [s for s in re.split(r"```(?:[a-zA-Z]+)?", html) if s.strip()]
-        if segmentos:
-            html = segmentos[-1]
-    # 2) Remove tags de documento (<body>, <html>, <head>) — saída body-only.
-    html = re.sub(r"</?(?:body|html|head)\b[^>]*>", "", html, flags=re.IGNORECASE)
-    # 3) Remove prosa/raciocínio antes da primeira tag de bloco (caso sem cercas).
-    m = re.search(r"<(?:p|h2|h3|ul|ol)\b", html, flags=re.IGNORECASE)
-    if m:
-        html = html[m.start():]
-    html = html.strip()
-
-    permitidos_internos = {_normalizar_url(li["url"]) for li in LINKS_INTERNOS_DRRAIMUNDO}
-
-    def _href_permitido(href: str) -> bool:
-        h = (href or "").strip()
-        hl = h.lower()
-        if _normalizar_url(h) in permitidos_internos:
-            return True
-        if "wa.me" in hl or "api.whatsapp.com" in hl:
-            return True
-        if _usa_whitelist(h):
-            return True
-        return False
-
-    padrao_a = re.compile(r'<a\b[^>]*?href\s*=\s*["\']([^"\']*)["\'][^>]*>(.*?)</a>',
-                          re.IGNORECASE | re.DOTALL)
-
-    def _substituir(m: re.Match) -> str:
-        href, texto_ancora = m.group(1), m.group(2)
-        if _href_permitido(href):
-            return m.group(0)
-        return texto_ancora  # unwrap: mantém o texto, descarta o link inválido
-
-    return padrao_a.sub(_substituir, html)
+    """Defesa determinística: delega ao utilitário compartilhado (crews/_common.py)."""
+    return _sanitizar_base(html, LINKS_INTERNOS_DRRAIMUNDO, WHITELIST_EXTERNOS)
 
 # -------------------------------
 # SERP helper + whitelist (ginecologia / obstetrícia / saúde feminina)

@@ -101,6 +101,13 @@ def buscar_concorrentes_serpapi_texto(palavra_chave: str) -> str:
 # -------------------------------
 # Função principal — Clínica Dra. Catarine Padoveze
 # -------------------------------
+from crews._common import sanitizar_links as _sanitizar_base
+
+
+def sanitizar_links(html: str) -> str:
+    return _sanitizar_base(html, LINKS_INTERNOS_CLINICA, WHITELIST_EXTERNOS)
+
+
 def build_crew_catarine(tema: str, palavra_chave: str):
     """
     Gera SOMENTE o conteúdo do post (HTML do body), pronto para WordPress,
