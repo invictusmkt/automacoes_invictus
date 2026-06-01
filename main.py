@@ -19,7 +19,7 @@ from crews.dr_daniel.crew_dr_daniel import build_crew_drdaniel, sanitizar_links 
 from crews.moc_advogados.crew_moc_advogados import build_crew_mocadvogados, sanitizar_links as san_mocadvogados
 from crews.people_partner.crew_people_partner import build_crew_peoplepartner, sanitizar_links as san_peoplepartner
 from crews.dr_ricardo.crew_dr_ricardo import build_crew_drricardo, sanitizar_links as san_drricardo
-from crews.dr_raimundo.crew_dr_raimundo import build_crew_drraimundo, sanitizar_links as san_drraimundo
+from crews.dr_raimundo.crew_dr_raimundo import build_crew_drraimundo, finalizar_html as finalizar_drraimundo
 
 
 
@@ -184,8 +184,8 @@ def executar_crew_peoplepartner(tema: str = Query(...), palavra_chave: str = Que
 def executar_crew_drraimundo(tema: str = Query(...), palavra_chave: str = Query(...)):
     crew = build_crew_drraimundo(tema, palavra_chave)
     resultado = crew.kickoff()
-    # Defesa determinística: remove links inventados/quebrados do HTML final
-    resultado.raw = san_drraimundo(resultado.raw)
+    # Pós-processamento determinístico: sanitiza links + anexa assinatura fixa
+    resultado.raw = finalizar_drraimundo(resultado.raw)
     return JSONResponse(content=resultado.model_dump())
 
 
