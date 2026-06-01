@@ -181,7 +181,7 @@ def build_crew_drraimundo(tema: str, palavra_chave: str):
     )
     agente_outline = Agent(
         role="Arquiteto de Estrutura (H2/H3) — Ginecologia e Obstetrícia",
-        goal="Definir 5–7 H2 numerados com H3 opcionais; contemplar: o que é, quem se beneficia, como é feito, cuidados, mitos e quando buscar um especialista.",
+        goal="Definir exatamente 5 H2 numerados (máx. 1 H3 por seção); contemplar: o que é, quem se beneficia, como é feito, cuidados, mitos e quando buscar um especialista.",
         backstory="Especialista em outline SEO para clínicas ginecológicas de referência; foca na jornada da paciente do diagnóstico ao acompanhamento.",
         verbose=True, allow_delegation=False, llm=llm_thinking,
     )
@@ -236,7 +236,7 @@ Concorrência:\n{dados_concorrencia_txt}""".strip(),
     )
     tarefa_outline = Task(
         description=f"""
-Crie a ESTRUTURA para '{tema}': 5–7 <h2> numerados, até 2 <h3> por seção.
+Crie a ESTRUTURA para '{tema}': exatamente 5 <h2> numerados, no máximo 1 <h3> por seção.
 Inclua H2 de "Mitos e verdades", H2 "Como é feito o procedimento / acompanhamento" e H2 "Quando consultar um ginecologista".
 Pelo menos 1 heading com '{palavra_chave}'. Nunca <h1>. Só headings.
 - Alinhar os H2 com a intenção de busca: responder diretamente o que o usuário quer saber sobre o tema.
@@ -248,7 +248,7 @@ Concorrência:\n{dados_concorrencia_txt}""".strip(),
     )
     tarefa_desenvolvimento = Task(
         description=f"""
-Desenvolva o CORPO (mín. 1200 palavras): <p> curtos, <ul><li> quando listar.
+Desenvolva o CORPO com extensão-alvo de 1.300 a 1.600 palavras; NÃO ultrapasse 1.800 palavras. Prefira <p> curtos e use <ul><li> quando listar.
 Cubra: conceito, indicações, contraindicações, como funciona na prática, cuidados antes/durante/depois, expectativas realistas, mitos comuns e quando buscar ginecologista.
 Usar linguagem empática; nunca prometer resultado; sempre recomendar avaliação individualizada.
 {REGRA_KEYWORD}
@@ -270,7 +270,7 @@ Concorrência:\n{dados_concorrencia_txt}""".strip(),
         agent=agente_conclusao
     )
     tarefa_unificar = Task(
-        description="Una tudo em HTML único (body only). Mín. 1200 palavras. Tags: <h2>,<h3>,<p>,<ul>,<li>,<a>,<strong>,<em>. PROIBIDO: <h1>,<html>,<head>,meta,estilos inline,imagens.",
+        description="Una tudo em HTML único (body only). Tamanho final entre 1.300 e 1.600 palavras (máx. 1.800); não repita conteúdo entre seções. Tags: <h2>,<h3>,<p>,<ul>,<li>,<a>,<strong>,<em>. PROIBIDO: <h1>,<html>,<head>,meta,estilos inline,imagens.",
         expected_output="HTML WordPress-ready (body only).",
         agent=agente_unificador,
         context=[tarefa_intro, tarefa_outline, tarefa_desenvolvimento, tarefa_conclusao]
