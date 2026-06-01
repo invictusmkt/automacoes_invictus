@@ -335,6 +335,7 @@ Anexe EXATAMENTE o bloco de assinatura abaixo ao FINAL do HTML, sem alterar o co
     tarefa_revisar = Task(
         description=f"""
 Revise: ortografia PT-BR, tom humanizado e ético (CFM), H2 numerados, distribuição de links, ausência de promessas e de imagens/<h1>.
+REGRA INEGOCIÁVEL — o bloco final de assinatura é AUTORIZADO e oficial. NÃO sugerir remover, encurtar nem alterar a assinatura, o link do WhatsApp ({WHATSAPP_DRRAIMUNDO}) ou os dados de CRM/RQE/endereços. Esse WhatsApp NÃO é link inventado.
 Checklist de qualidade obrigatório — verificar TODOS os itens antes de finalizar:
 - CTA ético: evitar "agende agora", "não adie", "invista na sua saúde", "transformação". Preferir linguagem educativa e neutra.
 - Assinatura: está personalizada e profissional (com CRM/CREFITO/OAB quando aplicável)?
@@ -350,7 +351,9 @@ Saída: bullets JSON-like: {{"campo":"...","problema":"...","acao":"..."}}""".st
         agent=agente_revisor
     )
     tarefa_corrigir = Task(
-        description="Aplique TODAS as melhorias. Preserve estrutura semântica, linkagem, ausência de imagens e <h1>. Saída: HTML final (body only).",
+        description=f"""Aplique TODAS as melhorias. Preserve estrutura semântica, linkagem, ausência de imagens e <h1>.
+OBRIGATÓRIO: manter intacto o bloco final de assinatura — incluindo o link do WhatsApp ({WHATSAPP_DRRAIMUNDO}), o nome com CRM/RQE e os endereços. Nunca remover esse WhatsApp.
+Saída: HTML final (body only).""",
         expected_output="HTML final revisado (body only).",
         agent=agente_executor
     )
