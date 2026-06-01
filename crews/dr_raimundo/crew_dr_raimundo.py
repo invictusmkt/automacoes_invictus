@@ -1,10 +1,20 @@
 ﻿# -*- coding: utf-8 -*-
 import os
+import re
 from dotenv import load_dotenv
 from serpapi import GoogleSearch
 from crewai import Crew, Agent, Task, LLM
 
 load_dotenv()
+
+# ── Diretriz reutilizável de uso da palavra-chave (anti-stuffing) ──────────────
+REGRA_KEYWORD = (
+    "Uso da palavra-chave: ela pode (e deve) ser flexionada, reordenada ou "
+    "parcialmente reescrita para soar 100% natural na frase. NUNCA insira a frase "
+    "exata da palavra-chave como bloco isolado, com inicial maiúscula forçada, nem "
+    "destacada em <em>/<strong>. No máximo 1 menção próxima à forma exata em todo o "
+    "texto; as demais devem ser variações semânticas e sinônimos."
+)
 
 # ── Configuração do cliente ───────────────────────────────────────────────────
 CLIENTE = {
@@ -78,6 +88,52 @@ LINKS_INTERNOS_DRRAIMUNDO = [
 ]
 
 WHATSAPP_DRRAIMUNDO = "https://wa.me/5511973071245?text=Gostaria%20de%20tirar%20uma%20dúvida%20e%20marcar%20uma%20consulta"
+
+# Endereços oficiais (usados na assinatura institucional)
+ENDERECOS_DRRAIMUNDO = (
+    "Unidade Bela Vista: Rua Itapeva, 490 – 5º Andar, Cj. 51 – São Paulo/SP | (11) 3251-1245<br>\n"
+    "Unidade Itaim Bibi: Rua Joaquim Floriano, 940 – Cj. 41 – São Paulo/SP"
+)
+
+
+def _normalizar_url(url: str) -> str:
+    return (url or "").strip().rstrip("/").lower()
+
+
+def sanitizar_links(html: str) -> str:
+    """Defesa determinística contra links quebrados/inventados.
+
+    Varre todas as tags <a> do HTML final e, para cada href que NÃO esteja no
+    catálogo interno, na whitelist de autoridades externas ou no WhatsApp oficial,
+    remove o link preservando o texto da âncora (faz unwrap). Elimina URLs
+    relativas (/...) e páginas inventadas pelo modelo.
+    """
+    if not html:
+        return html
+
+    permitidos_internos = {_normalizar_url(li["url"]) for li in LINKS_INTERNOS_DRRAIMUNDO}
+
+    def _href_permitido(href: str) -> bool:
+        h = (href or "").strip()
+        hl = h.lower()
+        if _normalizar_url(h) in permitidos_internos:
+            return True
+        if "wa.me" in hl or "api.whatsapp.com" in hl:
+            return True
+        if _usa_whitelist(h):
+            return True
+        return False
+
+    padrao_a = re.compile(r'<a\b[^>]*?href\s*=\s*["\']([^"\']*)["\'][^>]*>(.*?)</a>',
+                          re.IGNORECASE | re.DOTALL)
+
+    def _substituir(m: re.Match) -> str:
+        href, texto_ancora = m.group(1), m.group(2)
+        if _href_permitido(href):
+            return m.group(0)
+        return texto_ancora  # unwrap: mantém o texto, descarta o link inválido
+
+    return padrao_a.sub(_substituir, html)
 
 # -------------------------------
 # SERP helper + whitelist (ginecologia / obstetrícia / saúde feminina)
@@ -198,6 +254,7 @@ def build_crew_drraimundo(tema: str, palavra_chave: str):
     tarefa_intro = Task(
         description=f"""
 Escreva a INTRODUÇÃO (2–3 <p>) para '{tema}' usando a palavra-chave '{palavra_chave}' apenas 1 vez.
+{REGRA_KEYWORD}
 Tom: Clínica Dr. Raimundo Nunes — humanizado, acolhedor e técnico. Referência em ginecologia há 30+ anos em SP.
 Conteúdo estritamente educativo (alinhado ao CFM); nunca prometer resultado; sem afirmações absolutas.
 Regras: PT-BR; PROIBIDO <h1> e imagens; só <p>.
@@ -223,7 +280,8 @@ Concorrência:\n{dados_concorrencia_txt}""".strip(),
 Desenvolva o CORPO (mín. 1200 palavras): <p> curtos, <ul><li> quando listar.
 Cubra: conceito, indicações, contraindicações, como funciona na prática, cuidados antes/durante/depois, expectativas realistas, mitos comuns e quando buscar ginecologista.
 Usar linguagem empática; nunca prometer resultado; sempre recomendar avaliação individualizada.
-Variar semântica de '{palavra_chave}' sem stuffing. Zero imagens. Zero CTA.
+{REGRA_KEYWORD}
+Zero imagens. Zero CTA.
 Diretrizes de qualidade obrigatórias:
 - SEO local: inserir de forma natural "{_localidade}" no corpo do texto (mínimo 2 menções). Evitar repetição artificial.
 - Conexão com serviço: conectar o tema aos serviços reais do cliente — {_servicos_resumo}.
@@ -254,19 +312,24 @@ Concorrência:\n{dados_concorrencia_txt}""".strip(),
 Insira LINKAGEM no HTML unificado.
 Links internos (use >=3):\n{links_internos_txt}
 Links externos (use >=1, se listado; target="_blank" rel="noopener noreferrer"):\n{links_externos_txt}
-Regras: âncoras descritivas; não linkar em headings; sem inline style; sem imagens.""".strip(),
+Regras: âncoras descritivas; não linkar em headings; sem inline style; sem imagens.
+PROIBIDO inventar URLs: use SOMENTE as URLs exatas listadas acima (mais o WhatsApp da assinatura).
+Nunca crie caminhos relativos (ex.: /alguma-pagina), âncoras placeholder ou páginas que não constam no catálogo.
+Se não houver link interno adequado para um trecho, deixe o trecho sem link em vez de inventar um destino.""".strip(),
         expected_output="HTML com links aplicados.",
         agent=agente_linkagem
     )
+    assinatura_html = f"""
+<p>Para esclarecer dúvidas ou avaliar a melhor conduta para o seu caso, a equipe da clínica está à disposição.</p>
+<p><a href="{WHATSAPP_DRRAIMUNDO}" target="_blank" rel="noopener noreferrer">Fale com a nossa equipe pelo WhatsApp</a></p>
+<p><strong>{CLIENTE['assinatura']}</strong><br>
+{ENDERECOS_DRRAIMUNDO}</p>""".strip()
+
     tarefa_assinatura = Task(
         description=f"""
-Anexe ao FINAL do HTML a assinatura da Clínica Dr. Raimundo Nunes (sem alterar o conteúdo anterior):
-<p><strong>Cuide da sua saúde com quem tem mais de 30 anos de experiência em ginecologia e obstetrícia.</strong></p>
-<p><a href="{WHATSAPP_DRRAIMUNDO}" target="_blank" rel="noopener noreferrer">Agende sua consulta pelo WhatsApp</a></p>
-<p><strong>Clínica Dr. Raimundo Nunes</strong><br>
-Unidade Bela Vista: Rua Itapeva, 490 – 5º Andar, Cj. 51 – São Paulo/SP | (11) 3251-1245<br>
-Unidade Itaim Bibi: Rua Joaquim Floriano, 940 – Cj. 41 – São Paulo/SP</p>""".strip(),
-        expected_output="HTML final com assinatura.",
+Anexe EXATAMENTE o bloco de assinatura abaixo ao FINAL do HTML, sem alterar o conteúdo anterior e sem modificar nenhum caractere do bloco (inclui identificação profissional com CRM/RQE):
+{assinatura_html}""".strip(),
+        expected_output="HTML final com a assinatura institucional (com CRM/RQE) anexada ao final.",
         agent=agente_assinatura
     )
     tarefa_revisar = Task(
