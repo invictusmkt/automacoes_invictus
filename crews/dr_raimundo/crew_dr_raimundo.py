@@ -111,6 +111,12 @@ def sanitizar_links(html: str) -> str:
     if not html:
         return html
 
+    # Remove cercas markdown (```html ... ```) e tags de documento (<body>, <html>,
+    # <head>) que o modelo às vezes adiciona, garantindo saída body-only.
+    html = re.sub(r"```[a-zA-Z]*", "", html).replace("```", "")
+    html = re.sub(r"</?(?:body|html|head)\b[^>]*>", "", html, flags=re.IGNORECASE)
+    html = html.strip()
+
     permitidos_internos = {_normalizar_url(li["url"]) for li in LINKS_INTERNOS_DRRAIMUNDO}
 
     def _href_permitido(href: str) -> bool:
