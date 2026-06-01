@@ -94,6 +94,13 @@ def selecionar_links_externos_autoritativos(resultados_serp: list[dict], max_lin
 # -------------------------------
 # Função principal (Dra. Karen Voltan)
 # -------------------------------
+from crews._common import sanitizar_links as _sanitizar_base
+
+
+def sanitizar_links(html: str) -> str:
+    return _sanitizar_base(html, LINKS_INTERNOS_KAREN, WHITELIST_EXTERNOS)
+
+
 def build_crew_karen(tema: str, palavra_chave: str):
     """
     Gera SOMENTE o conteúdo do post (HTML do body), pronto para WordPress,

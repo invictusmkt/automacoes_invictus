@@ -95,6 +95,13 @@ def buscar_concorrentes_serpapi_texto(palavra_chave: str) -> str:
 # -------------------------------
 # Função principal — People Partner
 # -------------------------------
+from crews._common import sanitizar_links as _sanitizar_base
+
+
+def sanitizar_links(html: str) -> str:
+    return _sanitizar_base(html, LINKS_INTERNOS_PEOPLEPARTNER, WHITELIST_EXTERNOS)
+
+
 def build_crew_peoplepartner(tema: str, palavra_chave: str):
     """
     Gera conteúdo HTML body-only para WordPress no tom da People Partner:

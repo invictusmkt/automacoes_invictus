@@ -91,6 +91,13 @@ def buscar_concorrentes_serpapi_texto(palavra_chave: str) -> str:
 # -------------------------------
 # Função principal — ITC Vertebral Jundiaí (dra_silvia)
 # -------------------------------
+from crews._common import sanitizar_links as _sanitizar_base
+
+
+def sanitizar_links(html: str) -> str:
+    return _sanitizar_base(html, LINKS_INTERNOS_ITCVERTEBRAL, WHITELIST_EXTERNOS)
+
+
 def build_crew_drasilvia(tema: str, palavra_chave: str):
     """
     Gera conteúdo HTML body-only para WordPress no tom do ITC Vertebral Jundiaí:
