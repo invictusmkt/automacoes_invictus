@@ -111,10 +111,19 @@ def sanitizar_links(html: str) -> str:
     if not html:
         return html
 
-    # Remove cercas markdown (```html ... ```) e tags de documento (<body>, <html>,
-    # <head>) que o modelo às vezes adiciona, garantindo saída body-only.
-    html = re.sub(r"```[a-zA-Z]*", "", html).replace("```", "")
+    # 1) Se houver blocos cercados (```html ... ```), mantém só o conteúdo do
+    #    ÚLTIMO bloco. O modelo às vezes vaza raciocínio (com exemplos cercados)
+    #    antes da resposta final — a resposta real é sempre o último bloco.
+    if "```" in html:
+        segmentos = [s for s in re.split(r"```(?:[a-zA-Z]+)?", html) if s.strip()]
+        if segmentos:
+            html = segmentos[-1]
+    # 2) Remove tags de documento (<body>, <html>, <head>) — saída body-only.
     html = re.sub(r"</?(?:body|html|head)\b[^>]*>", "", html, flags=re.IGNORECASE)
+    # 3) Remove prosa/raciocínio antes da primeira tag de bloco (caso sem cercas).
+    m = re.search(r"<(?:p|h2|h3|ul|ol)\b", html, flags=re.IGNORECASE)
+    if m:
+        html = html[m.start():]
     html = html.strip()
 
     permitidos_internos = {_normalizar_url(li["url"]) for li in LINKS_INTERNOS_DRRAIMUNDO}
