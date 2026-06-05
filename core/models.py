@@ -54,9 +54,9 @@ class ClientConfig:
     diferencial: str = ""
     credenciais: str = ""
 
-    # Controle de extensão do post
-    target_palavras: tuple = (1300, 1600)
-    teto_palavras: int = 1800
+    # Controle de extensão do post (alvo 1000-1200, teto rígido 1200)
+    target_palavras: tuple = (1000, 1200)
+    teto_palavras: int = 1200
 
     # Customização da assinatura
     assinatura_intro: str = (
