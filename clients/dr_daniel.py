@@ -1,0 +1,70 @@
+# -*- coding: utf-8 -*-
+"""Dr. Daniel Rebolledo — Cirurgia do Quadril e Oncologia Ortopédica (São Paulo/SP)."""
+from core.models import ClientConfig, LinkInterno
+
+CONFIG = ClientConfig(
+    slug="dr_daniel",
+    nome="Dr. Daniel César Seguel Rebolledo",
+    especialidade="Ortopedia (Cirurgia do Quadril e Oncologia Ortopédica)",
+    segmento="saude",
+    dominio_oficial="danielrebolledo.com.br",
+
+    cidade="São Paulo",
+    estado="SP",
+    credenciais="CRM-SP 104291 | RQE 10207",
+    servicos=[
+        "cirurgia do quadril (artroplastia/prótese de quadril)",
+        "tratamento de tumores ósseos e de partes moles",
+        "viscossuplementação e infiltrações no quadril",
+        "artroscopia de quadril",
+    ],
+    publico="pacientes com dores, lesões ou fraturas no quadril e pessoas com suspeita ou diagnóstico de tumores ósseos",
+    diferencial="dupla especialidade (Quadril e Oncologia Ortopédica), formado pela USP, aliando técnicas cirúrgicas modernas a atendimento humanizado",
+
+    links_internos=[
+        LinkInterno("Home — Dr. Daniel Rebolledo", "https://www.danielrebolledo.com.br/",
+                    "Dr. Daniel Rebolledo — cirurgião de quadril e oncologia ortopédica"),
+        LinkInterno("Perfil do Médico", "https://www.danielrebolledo.com.br/perfil/",
+                    "conheça o perfil e a experiência do Dr. Daniel Rebolledo"),
+        LinkInterno("Consultórios", "https://www.danielrebolledo.com.br/clinicas/",
+                    "locais de atendimento em São Paulo e Santo André"),
+        LinkInterno("Blog", "https://www.danielrebolledo.com.br/blog/",
+                    "artigos sobre quadril e oncologia ortopédica"),
+        LinkInterno("Patologias do Quadril", "https://www.danielrebolledo.com.br/quadril/patologias/",
+                    "principais patologias do quadril"),
+        LinkInterno("Artrose de Quadril", "https://www.danielrebolledo.com.br/quadril/patologias/atrose-quadril/",
+                    "artrose de quadril: causas e tratamentos"),
+        LinkInterno("Artroplastia do Quadril",
+                    "https://www.danielrebolledo.com.br/quadril/tratamentos/artroplastia-do-quadril-proteses/",
+                    "artroplastia do quadril e próteses"),
+        LinkInterno("Artroscopia de Quadril",
+                    "https://www.danielrebolledo.com.br/quadril/tratamentos/artroscopia-de-quadril/",
+                    "artroscopia de quadril minimamente invasiva"),
+        LinkInterno("Viscossuplementação",
+                    "https://www.danielrebolledo.com.br/quadril/tratamentos/viscossuplementacao-acido-hialuronico/",
+                    "viscossuplementação com ácido hialurônico no quadril"),
+        LinkInterno("Oncologia Ortopédica", "https://www.danielrebolledo.com.br/oncologia-ortopedica/",
+                    "oncologia ortopédica: tumores ósseos e de partes moles"),
+        LinkInterno("Tumores Benignos", "https://www.danielrebolledo.com.br/oncologia-ortopedica/tumores-benignos/",
+                    "tumores ósseos benignos: diagnóstico e tratamento"),
+        LinkInterno("Metástases Ósseas",
+                    "https://www.danielrebolledo.com.br/oncologia-ortopedica/tumores-malignos/metastases-osseas/",
+                    "tratamento de metástases ósseas"),
+    ],
+    whitelist_externos=[
+        ".gov", ".gov.br", ".edu", ".edu.br",
+        "saude.gov.br", "who.int", "nih.gov",
+        "inca.gov.br", "oncoguia.org.br",
+        "sbot.org.br", "sbco.org.br",
+        "developers.google.com",
+        "schema.org", "w3.org",
+        "moz.com", "ahrefs.com", "semrush.com",
+    ],
+
+    whatsapp="https://api.whatsapp.com/send/?phone=5511933870542&text=Oi!%20Encontrei%20o%20Dr.%20Daniel%20Rebolledo%20no%20Google%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es.&type=phone_number&app_absent=0",
+    enderecos=[
+        "Rua Haddock Lobo, 131 – cj. 1509 – Cerqueira César – São Paulo/SP",
+        "Rua das Paineiras, 161 – Jardim – Santo André/SP",
+    ],
+    assinatura="Dr. Daniel César Seguel Rebolledo — Cirurgia do Quadril e Oncologia Ortopédica | CRM-SP 104291 | RQE 10207",
+)

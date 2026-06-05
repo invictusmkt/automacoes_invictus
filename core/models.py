@@ -41,9 +41,9 @@ class ClientConfig:
     whitelist_externos: list[str]
 
     # Assinatura institucional (anexada de forma determinística)
-    whatsapp: str
-    enderecos: list[str]
     assinatura: str
+    whatsapp: str = ""
+    enderecos: list[str] = field(default_factory=list)
 
     # Contexto opcional para enriquecer os prompts
     cidade: str = ""

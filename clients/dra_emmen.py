@@ -1,0 +1,68 @@
+# -*- coding: utf-8 -*-
+"""Dra. Emmen Rocha — Ginecologia e Obstetrícia (Lavras/MG)."""
+from core.models import ClientConfig, LinkInterno
+
+CONFIG = ClientConfig(
+    slug="dra_emmen",
+    nome="Dra. Emmen Rocha",
+    especialidade="Ginecologia e Obstetrícia",
+    segmento="saude",
+    dominio_oficial="draemmenrocha.com.br",
+
+    cidade="Lavras",
+    estado="MG",
+    credenciais="CRM-MG 72484 | RQE 53688",
+    servicos=[
+        "parto humanizado e respeitoso",
+        "pré-natal de risco habitual e alto risco",
+        "colocação de DIU e implantes contraceptivos (Implanon)",
+        "tratamento de endometriose",
+        "cirurgias ginecológicas",
+    ],
+    publico="mulheres em busca de saúde reprodutiva, métodos contraceptivos seguros e pré-natal ou parto humanizado",
+    diferencial="atendimento humanizado focado na autonomia da mulher, especialista em pré-natal de alto risco e parto humanizado respeitoso",
+
+    links_internos=[
+        LinkInterno("Home", "https://draemmenrocha.com.br/",
+                    "especialista em ginecologia e obstetrícia"),
+        LinkInterno("Sobre", "https://draemmenrocha.com.br/sobre/",
+                    "conheça mais sobre a Dra. Emmen Rocha"),
+        LinkInterno("Tratamentos", "https://draemmenrocha.com.br/tratamentos/",
+                    "tratamentos ginecológicos especializados"),
+        LinkInterno("Blog", "https://draemmenrocha.com.br/blog/",
+                    "conteúdos sobre saúde da mulher"),
+        LinkInterno("Contato", "https://draemmenrocha.com.br/contato/",
+                    "agende sua consulta com a Dra. Emmen Rocha"),
+        LinkInterno("Pré-natal", "https://draemmenrocha.com.br/tratamentos/pre-natal/",
+                    "acompanhamento pré-natal humanizado"),
+        LinkInterno("Parto Humanizado", "https://draemmenrocha.com.br/tratamentos/parto-humanizado/",
+                    "parto humanizado e respeitoso"),
+        LinkInterno("Endometriose", "https://draemmenrocha.com.br/tratamentos/endometriose/",
+                    "tratamento da endometriose"),
+        LinkInterno("Contracepção", "https://draemmenrocha.com.br/tratamentos/contracepcao/",
+                    "métodos contraceptivos adequados"),
+        LinkInterno("Corrimentos", "https://draemmenrocha.com.br/tratamentos/corrimentos/",
+                    "tratamento de corrimentos vaginais"),
+        LinkInterno("Sangramento Uterino Anormal", "https://draemmenrocha.com.br/tratamentos/sangramento-uterino-anormal/",
+                    "tratamento de sangramento uterino anormal"),
+        LinkInterno("Aborto de Repetição", "https://draemmenrocha.com.br/tratamentos/aborto-repeticao/",
+                    "investigação e tratamento do aborto de repetição"),
+        LinkInterno("Cirurgia Ginecológica", "https://draemmenrocha.com.br/tratamentos/cirurgia-ginecologica/",
+                    "procedimentos cirúrgicos ginecológicos"),
+        LinkInterno("Curso para Gestantes", "https://draemmenrocha.com.br/tratamentos/curso-gestantes/",
+                    "curso de preparação para gestantes"),
+    ],
+    whitelist_externos=[
+        ".gov", ".gov.br", ".edu", ".edu.br",
+        "febrasgo.org.br", "cfm.org.br", "who.int", "nhs.uk", "cdc.gov",
+        "nih.gov", "ncbi.nlm.nih.gov", "medlineplus.gov",
+        "cochranelibrary.com", "anvisa.gov.br",
+        "schema.org", "w3.org", "developers.google.com", "support.google.com",
+        "pubmed.ncbi.nlm.nih.gov", "scielo.br",
+    ],
+
+    # whatsapp e enderecos: FALTA no crew legado — preencher manualmente
+    whatsapp="",
+    enderecos=[],
+    assinatura="Dra. Emmen Rocha — Ginecologia e Obstetrícia em Lavras/MG | CRM-MG 72484 | RQE 53688",
+)

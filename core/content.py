@@ -16,14 +16,23 @@ def sanitizar_links(html: str, cfg: ClientConfig) -> str:
 
 
 def montar_assinatura(cfg: ClientConfig) -> str:
-    """Bloco fixo de assinatura (intro + WhatsApp + razão social + endereços)."""
-    enderecos = "<br>\n".join(cfg.enderecos)
-    return (
-        f"<p>{cfg.assinatura_intro}</p>\n"
-        f'<p><a href="{cfg.whatsapp}" target="_blank" rel="noopener noreferrer">'
-        f"{cfg.cta_whatsapp_label}</a></p>\n"
-        f"<p><strong>{cfg.assinatura}</strong><br>\n{enderecos}</p>"
-    ).strip()
+    """Bloco fixo de assinatura (intro + WhatsApp + razão social + endereços).
+
+    Campos vazios são omitidos: cliente sem WhatsApp não recebe o parágrafo de CTA;
+    cliente sem endereços recebe só a razão social.
+    """
+    partes = [f"<p>{cfg.assinatura_intro}</p>"]
+    if cfg.whatsapp:
+        partes.append(
+            f'<p><a href="{cfg.whatsapp}" target="_blank" rel="noopener noreferrer">'
+            f"{cfg.cta_whatsapp_label}</a></p>"
+        )
+    if cfg.enderecos:
+        enderecos = "<br>\n".join(cfg.enderecos)
+        partes.append(f"<p><strong>{cfg.assinatura}</strong><br>\n{enderecos}</p>")
+    else:
+        partes.append(f"<p><strong>{cfg.assinatura}</strong></p>")
+    return "\n".join(partes).strip()
 
 
 def finalizar_html(html: str, cfg: ClientConfig) -> str:
