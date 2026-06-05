@@ -94,6 +94,24 @@ def sanitizar_links(html: str) -> str:
     """Defesa determinística: delega ao utilitário compartilhado (crews/_common.py)."""
     return _sanitizar_base(html, LINKS_INTERNOS_DRRAIMUNDO, WHITELIST_EXTERNOS)
 
+
+# Assinatura institucional — bloco fixo, anexado de forma determinística (não passa
+# por LLM, garantindo integridade de WhatsApp, CRM/RQE e endereços).
+ASSINATURA_HTML = f"""
+<p>Para esclarecer dúvidas ou avaliar a melhor conduta para o seu caso, a equipe da clínica está à disposição.</p>
+<p><a href="{WHATSAPP_DRRAIMUNDO}" target="_blank" rel="noopener noreferrer">Fale com a nossa equipe pelo WhatsApp</a></p>
+<p><strong>{CLIENTE['assinatura']}</strong><br>
+{ENDERECOS_DRRAIMUNDO}</p>""".strip()
+
+
+def finalizar_html(html: str) -> str:
+    """Pós-processamento determinístico final aplicado ao resultado da crew:
+    1) sanitiza links (remove inventados/quebrados, cercas, tags de documento);
+    2) anexa a assinatura institucional imutável ao fim.
+    """
+    corpo = sanitizar_links(html)
+    return corpo.rstrip() + "\n\n" + ASSINATURA_HTML
+
 # -------------------------------
 # SERP helper + whitelist (ginecologia / obstetrícia / saúde feminina)
 # -------------------------------
@@ -163,7 +181,7 @@ def build_crew_drraimundo(tema: str, palavra_chave: str):
     )
     agente_outline = Agent(
         role="Arquiteto de Estrutura (H2/H3) — Ginecologia e Obstetrícia",
-        goal="Definir 5–7 H2 numerados com H3 opcionais; contemplar: o que é, quem se beneficia, como é feito, cuidados, mitos e quando buscar um especialista.",
+        goal="Definir exatamente 5 H2 numerados (máx. 1 H3 por seção); contemplar: o que é, quem se beneficia, como é feito, cuidados, mitos e quando buscar um especialista.",
         backstory="Especialista em outline SEO para clínicas ginecológicas de referência; foca na jornada da paciente do diagnóstico ao acompanhamento.",
         verbose=True, allow_delegation=False, llm=llm_thinking,
     )
@@ -189,12 +207,6 @@ def build_crew_drraimundo(tema: str, palavra_chave: str):
         role="Planejador de Linkagem — Clínica Dr. Raimundo Nunes",
         goal="Inserir links internos/externos de forma natural, distribuída e compatível com EEAT médico.",
         backstory="Especialista em internal linking para clínicas ginecológicas; prioriza FEBRASGO, CFM, INCA e gov.br.",
-        verbose=True, allow_delegation=False, llm=llm_fast,
-    )
-    agente_assinatura = Agent(
-        role="Responsável por Assinatura — Clínica Dr. Raimundo Nunes",
-        goal="Anexar assinatura institucional ao final, sem alterar o conteúdo anterior.",
-        backstory="Padronização humanizada e acolhedora, alinhada aos 30+ anos de tradição da clínica.",
         verbose=True, allow_delegation=False, llm=llm_fast,
     )
     agente_revisor = Agent(
@@ -224,7 +236,7 @@ Concorrência:\n{dados_concorrencia_txt}""".strip(),
     )
     tarefa_outline = Task(
         description=f"""
-Crie a ESTRUTURA para '{tema}': 5–7 <h2> numerados, até 2 <h3> por seção.
+Crie a ESTRUTURA para '{tema}': exatamente 5 <h2> numerados, no máximo 1 <h3> por seção.
 Inclua H2 de "Mitos e verdades", H2 "Como é feito o procedimento / acompanhamento" e H2 "Quando consultar um ginecologista".
 Pelo menos 1 heading com '{palavra_chave}'. Nunca <h1>. Só headings.
 - Alinhar os H2 com a intenção de busca: responder diretamente o que o usuário quer saber sobre o tema.
@@ -236,7 +248,7 @@ Concorrência:\n{dados_concorrencia_txt}""".strip(),
     )
     tarefa_desenvolvimento = Task(
         description=f"""
-Desenvolva o CORPO (mín. 1200 palavras): <p> curtos, <ul><li> quando listar.
+Desenvolva o CORPO com extensão-alvo de 1.300 a 1.600 palavras; NÃO ultrapasse 1.800 palavras. Prefira <p> curtos e use <ul><li> quando listar.
 Cubra: conceito, indicações, contraindicações, como funciona na prática, cuidados antes/durante/depois, expectativas realistas, mitos comuns e quando buscar ginecologista.
 Usar linguagem empática; nunca prometer resultado; sempre recomendar avaliação individualizada.
 {REGRA_KEYWORD}
@@ -258,9 +270,10 @@ Concorrência:\n{dados_concorrencia_txt}""".strip(),
         agent=agente_conclusao
     )
     tarefa_unificar = Task(
-        description="Una tudo em HTML único (body only). Mín. 1200 palavras. Tags: <h2>,<h3>,<p>,<ul>,<li>,<a>,<strong>,<em>. PROIBIDO: <h1>,<html>,<head>,meta,estilos inline,imagens.",
+        description="Una tudo em HTML único (body only). Tamanho final entre 1.300 e 1.600 palavras (máx. 1.800); não repita conteúdo entre seções. Tags: <h2>,<h3>,<p>,<ul>,<li>,<a>,<strong>,<em>. PROIBIDO: <h1>,<html>,<head>,meta,estilos inline,imagens.",
         expected_output="HTML WordPress-ready (body only).",
-        agent=agente_unificador
+        agent=agente_unificador,
+        context=[tarefa_intro, tarefa_outline, tarefa_desenvolvimento, tarefa_conclusao]
     )
 
     links_internos_txt = "\n".join(f"- {li['titulo']}: {li['url']} | âncora: {li['anchor_sugerida']}" for li in links_internos)
@@ -276,25 +289,13 @@ PROIBIDO inventar URLs: use SOMENTE as URLs exatas listadas acima (mais o WhatsA
 Nunca crie caminhos relativos (ex.: /alguma-pagina), âncoras placeholder ou páginas que não constam no catálogo.
 Se não houver link interno adequado para um trecho, deixe o trecho sem link em vez de inventar um destino.""".strip(),
         expected_output="HTML com links aplicados.",
-        agent=agente_linkagem
-    )
-    assinatura_html = f"""
-<p>Para esclarecer dúvidas ou avaliar a melhor conduta para o seu caso, a equipe da clínica está à disposição.</p>
-<p><a href="{WHATSAPP_DRRAIMUNDO}" target="_blank" rel="noopener noreferrer">Fale com a nossa equipe pelo WhatsApp</a></p>
-<p><strong>{CLIENTE['assinatura']}</strong><br>
-{ENDERECOS_DRRAIMUNDO}</p>""".strip()
-
-    tarefa_assinatura = Task(
-        description=f"""
-Anexe EXATAMENTE o bloco de assinatura abaixo ao FINAL do HTML, sem alterar o conteúdo anterior e sem modificar nenhum caractere do bloco (inclui identificação profissional com CRM/RQE):
-{assinatura_html}""".strip(),
-        expected_output="HTML final com a assinatura institucional (com CRM/RQE) anexada ao final.",
-        agent=agente_assinatura
+        agent=agente_linkagem,
+        context=[tarefa_unificar]
     )
     tarefa_revisar = Task(
         description=f"""
 Revise: ortografia PT-BR, tom humanizado e ético (CFM), H2 numerados, distribuição de links, ausência de promessas e de imagens/<h1>.
-REGRA INEGOCIÁVEL — o bloco final de assinatura é AUTORIZADO e oficial. NÃO sugerir remover, encurtar nem alterar a assinatura, o link do WhatsApp ({WHATSAPP_DRRAIMUNDO}) ou os dados de CRM/RQE/endereços. Esse WhatsApp NÃO é link inventado.
+REGRA INEGOCIÁVEL SOBRE LINKS — NÃO sugira remover nenhum link <a> que aponte para o domínio oficial 'clinicadrraimundonunes.com.br'. Esses são links internos legítimos do catálogo do cliente. Você pode sugerir melhorar o texto da âncora, mas nunca remover o link.
 Checklist de qualidade obrigatório — verificar TODOS os itens antes de finalizar:
 - CTA ético: evitar "agende agora", "não adie", "invista na sua saúde", "transformação". Preferir linguagem educativa e neutra.
 - Assinatura: está personalizada e profissional (com CRM/CREFITO/OAB quando aplicável)?
@@ -307,20 +308,23 @@ Checklist de qualidade obrigatório — verificar TODOS os itens antes de finali
 
 Saída: bullets JSON-like: {{"campo":"...","problema":"...","acao":"..."}}""".strip(),
         expected_output="Bullets com melhorias acionáveis.",
-        agent=agente_revisor
+        agent=agente_revisor,
+        context=[tarefa_linkagem]
     )
     tarefa_corrigir = Task(
-        description=f"""Aplique TODAS as melhorias. Preserve estrutura semântica, linkagem, ausência de imagens e <h1>.
-OBRIGATÓRIO: manter intacto o bloco final de assinatura — incluindo o link do WhatsApp ({WHATSAPP_DRRAIMUNDO}), o nome com CRM/RQE e os endereços. Nunca remover esse WhatsApp.
-Saída: HTML final (body only).""",
-        expected_output="HTML final revisado (body only).",
-        agent=agente_executor
+        description=f"""Aplique TODAS as melhorias sugeridas ao HTML COM LINKS (saída da linkagem). Preserve estrutura semântica, ausência de imagens e <h1>.
+OBRIGATÓRIO sobre links: mantenha TODOS os links <a> que apontam para o domínio oficial 'clinicadrraimundonunes.com.br'. NUNCA remova um link interno do catálogo — no máximo ajuste o texto da âncora. Não invente novas URLs.
+NÃO adicione bloco de assinatura, telefone ou WhatsApp — isso é anexado depois, fora do seu escopo.
+Saída: HTML final (body only), começando direto pela primeira tag de bloco.""",
+        expected_output="HTML final revisado (body only), com todos os links internos do catálogo preservados.",
+        agent=agente_executor,
+        context=[tarefa_linkagem, tarefa_revisar]
     )
 
     return Crew(
         agents=[agente_intro, agente_outline, agente_desenvolvimento, agente_conclusao,
-                agente_unificador, agente_linkagem, agente_assinatura, agente_revisor, agente_executor],
+                agente_unificador, agente_linkagem, agente_revisor, agente_executor],
         tasks=[tarefa_intro, tarefa_outline, tarefa_desenvolvimento, tarefa_conclusao,
-               tarefa_unificar, tarefa_linkagem, tarefa_assinatura, tarefa_revisar, tarefa_corrigir],
+               tarefa_unificar, tarefa_linkagem, tarefa_revisar, tarefa_corrigir],
         verbose=True
     )
