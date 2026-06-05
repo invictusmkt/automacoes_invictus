@@ -53,6 +53,6 @@ CONFIG = ClientConfig(
     ],
 
     whatsapp="https://api.whatsapp.com/send/?phone=551934065984&text=Oi!%20Encontrei%20o%20Instituto%20Nexo%20no%20Google%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es.&type=phone_number&app_absent=0",
-    enderecos=[],   # FALTA no crew legado — preencher manualmente
+    enderecos=["Rua Dom Pedro II, 1169 – Conserva – Americana/SP"],   # demais 7 unidades não estavam detalhadas no site
     assinatura="Nexo — Instituto de Psicologia Aplicada em Americana/SP e Região",
 )

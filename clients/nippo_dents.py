@@ -12,6 +12,7 @@ CONFIG = ClientConfig(
     cidade="São Paulo",
     estado="SP",
     bairro="Saúde (próximo ao metrô São Judas)",
+    credenciais="CRO-SP 65086",
     servicos=[
         "ortodontia geral e estética (Invisalign)",
         "implantes dentários e prótese protocolo",
@@ -60,6 +61,6 @@ CONFIG = ClientConfig(
     ],
 
     whatsapp="https://api.whatsapp.com/send/?phone=5511963263528&text=Oi!%20Encontrei%20a%20Nippodents%20no%20Google%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es.&type=phone_number&app_absent=0",
-    enderecos=[],   # FALTA no crew legado — preencher manualmente
-    assinatura="Nippo Dents Odontologia — Clínica Odontológica em São Paulo/SP",
+    enderecos=["Av. Fagundes Filho, 141 – Cj. 66 – Bairro Saúde (próx. metrô São Judas) – São Paulo/SP – CEP 04304-010"],
+    assinatura="Nippo Dents Odontologia — Clínica Odontológica em São Paulo/SP | CRO-SP 65086",
 )

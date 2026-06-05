@@ -41,6 +41,6 @@ CONFIG = ClientConfig(
     ],
 
     whatsapp="https://api.whatsapp.com/send?phone=551735139264&text=Oi!%20Encontrei%20seu%20site%20no%20Google%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es.",
-    enderecos=[],   # endereço não estava no crew legado — preencher manualmente se desejar
+    enderecos=["Rua Fritz Jacob, 801 – CEP 15025-500 – São José do Rio Preto/SP"],
     assinatura="Núcleo Rural — Suplementação e Nutrição Animal em São José do Rio Preto/SP",
 )

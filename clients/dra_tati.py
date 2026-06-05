@@ -55,7 +55,7 @@ CONFIG = ClientConfig(
     ],
 
     whatsapp="https://api.whatsapp.com/send?phone=5511991578420&text=Oi!%20Encontrei%20seu%20contato%20no%20site%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es",
-    enderecos=[],   # endereço não estava na assinatura do crew legado
+    enderecos=["Rua Dr. Renato Paes de Barros, 714 – Cj. 42 – Itaim Bibi – São Paulo/SP – CEP 04534-011"],
     assinatura="Dra. Tatiana Villas Boas Gabbi — Dermatologista em São Paulo/SP | CRM-SP 104415 | RQE 31137",
     cta_whatsapp_label="Agende sua consulta via WhatsApp para avaliação especializada",
 )

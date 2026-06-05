@@ -53,6 +53,10 @@ CONFIG = ClientConfig(
     ],
 
     whatsapp="https://api.whatsapp.com/send/?phone=5517996611109&text=Oi!%20Encontrei%20a%20MOC%20Advogados%20no%20Google%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es.&type=phone_number&app_absent=0",
-    enderecos=[],   # FALTA no crew legado — preencher manualmente
+    enderecos=[
+        "São José do Rio Preto: Edifício Onix Center Sul, R. Antônio José Martins Filho, 300 – Salas 122/123 – Jd. Maracanã – São José do Rio Preto/SP",
+        "Marília: Complexo Empresarial Villas Boas, Av. das Esmeraldas, 821 – Sala 707 – Jd. Tangará – Marília/SP",
+        "Santos: R. Luís de Camões, 212 – Vila Mathias – Santos/SP",
+    ],
     assinatura="Martins, Oliveira & Cruz Advogados — Advocacia Contemporânea em São José do Rio Preto, Santos e Marília/SP",
 )
