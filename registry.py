@@ -19,6 +19,7 @@ from pipeline.builder import build_crew
 
 # ── Clientes migrados (pipeline novo) ──────────────────────────────────────────
 from clients.invictus import CONFIG as CFG_INVICTUS
+from clients.dra_ana_clara import CONFIG as CFG_DRA_ANA_CLARA
 from clients.dra_tati import CONFIG as CFG_DRA_TATI
 from clients.nucleo_rural import CONFIG as CFG_NUCLEO_RURAL
 from clients.villa_puppy import CONFIG as CFG_VILLA_PUPPY
@@ -65,6 +66,7 @@ def _legado(build_fn, san_fn):
 REGISTRO = {
     # ── Migrados (pipeline novo, 3 agentes) ────────────────────────────────
     "invictus":       _novo(CFG_INVICTUS),
+    "dra_ana_clara":  _novo(CFG_DRA_ANA_CLARA),
     "dra_tati":       _novo(CFG_DRA_TATI),
     "nucleo_rural":   _novo(CFG_NUCLEO_RURAL),
     "villa_puppy":    _novo(CFG_VILLA_PUPPY),

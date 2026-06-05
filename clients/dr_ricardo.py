@@ -11,6 +11,7 @@ CONFIG = ClientConfig(
 
     cidade="Jaraguá do Sul",
     estado="SC",
+    bairro="Centro",
     credenciais="CRM-SC 13164 | RQE Urologia 9029 | RQE Acupuntura 23022",
     servicos=[
         "reposição hormonal masculina e feminina",
@@ -50,6 +51,6 @@ CONFIG = ClientConfig(
     ],
 
     whatsapp="https://api.whatsapp.com/send?phone=5547999556456&text=Ol%C3%A1!%20Vim%20do%20site%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es.",
-    enderecos=[],   # FALTA no crew legado — preencher manualmente
+    enderecos=["Av. Mal. Deodoro da Fonseca, 1188 – Salas 208 e 209 – Centro – Jaraguá do Sul/SC – CEP 89251-702"],
     assinatura="Dr. Ricardo Vieira Ferreira — Reposição Hormonal e Urologia em Jaraguá do Sul/SC | CRM-SC 13164 | RQE 9029",
 )

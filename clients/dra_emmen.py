@@ -11,6 +11,7 @@ CONFIG = ClientConfig(
 
     cidade="Lavras",
     estado="MG",
+    bairro="Nossa Senhora",
     credenciais="CRM-MG 72484 | RQE 53688",
     servicos=[
         "parto humanizado e respeitoso",
@@ -61,8 +62,7 @@ CONFIG = ClientConfig(
         "pubmed.ncbi.nlm.nih.gov", "scielo.br",
     ],
 
-    # whatsapp e enderecos: FALTA no crew legado — preencher manualmente
-    whatsapp="",
-    enderecos=[],
+    whatsapp="https://wa.link/wweszj",
+    enderecos=["Rua Irmão Luiz Croembrock, 15 – Nossa Senhora – Lavras/MG – CEP 37203-623"],
     assinatura="Dra. Emmen Rocha — Ginecologia e Obstetrícia em Lavras/MG | CRM-MG 72484 | RQE 53688",
 )
