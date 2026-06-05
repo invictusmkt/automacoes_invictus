@@ -80,7 +80,5 @@ CONFIG = ClientConfig(
         "Para esclarecer dúvidas ou avaliar a melhor conduta para o seu caso, "
         "a equipe da clínica está à disposição."
     ),
-
-    target_palavras=(1300, 1600),
-    teto_palavras=1800,
+    # target_palavras / teto_palavras herdados do default (1000-1200, teto 1200)
 )
