@@ -95,7 +95,10 @@ Comece a saída direto pela primeira tag de bloco.
 
 Concorrência (referência de cobertura, não copie):
 {concorrencia}""".strip(),
-        expected_output="HTML body-only: intro em <p>, 5 <h2> numerados com <p>/<ul>, conclusão em <p>.",
+        expected_output=(
+            f"HTML body-only com no máximo {teto} palavras no total: intro em <p>, "
+            f"5 <h2> numerados com <p>/<ul>, conclusão em <p>."
+        ),
         agent=redator,
     )
 
@@ -146,6 +149,7 @@ Aplique melhorias de: ortografia PT-BR, fluidez, tom adequado, distribuição do
 REGRA INEGOCIÁVEL SOBRE LINKS: mantenha TODOS os <a> que apontam para o domínio oficial '{cfg.dominio_oficial}'. Esses são links internos legítimos do catálogo — no máximo melhore o texto da âncora, NUNCA remova o link nem invente novas URLs.
 
 Mantenha: 5 H2 numerados, ausência de <h1>/imagens, extensão entre {p_min} e {p_max} palavras (máx. {teto}).
+SE o texto recebido estiver acima de {teto} palavras, ENXUGUE eliminando frases redundantes, exemplos repetidos e adjetivos supérfluos — preservando todos os <a> e a coerência intro→5 H2→conclusão. NUNCA remova a conclusão; ela é a parte final obrigatória.
 NÃO adicione assinatura, telefone ou WhatsApp — isso é anexado depois, fora do seu escopo.
 Comece a saída direto pela primeira tag de bloco.""".strip(),
         expected_output="HTML final (body only), revisado, com todos os links internos do catálogo preservados.",
