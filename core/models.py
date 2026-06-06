@@ -54,9 +54,12 @@ class ClientConfig:
     diferencial: str = ""
     credenciais: str = ""
 
-    # Controle de extensão do post (alvo 1000-1200, teto rígido 1200)
-    target_palavras: tuple = (1000, 1200)
-    teto_palavras: int = 1200
+    # Controle de extensão do post.
+    # Gemini Flash entrega sistematicamente ~40% acima do alvo pedido no prompt,
+    # então pedimos um alvo menor para que o resultado real fique perto de 1100-1200 palavras.
+    # Se a LLM passar a respeitar o pedido literalmente, basta aumentar estes valores.
+    target_palavras: tuple = (700, 850)
+    teto_palavras: int = 900
 
     # Customização da assinatura
     assinatura_intro: str = (
