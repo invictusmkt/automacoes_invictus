@@ -33,6 +33,7 @@ from clients.dr_daniel import CONFIG as CFG_DR_DANIEL
 from clients.moc_advogados import CONFIG as CFG_MOC_ADVOGADOS
 from clients.people_partner import CONFIG as CFG_PEOPLE_PARTNER
 from clients.dr_raimundo import CONFIG as CFG_DR_RAIMUNDO
+from clients.pousada_maze import CONFIG as CFG_POUSADA_MAZE
 
 # ── Clientes legados (crews antigos, intactos até migração) ─────────────────────
 # Clientes NÃO incluídos na lista de migração do usuário continuam usando o crew antigo.
@@ -80,6 +81,7 @@ REGISTRO = {
     "moc_advogados":  _novo(CFG_MOC_ADVOGADOS),
     "people_partner": _novo(CFG_PEOPLE_PARTNER),
     "dr_raimundo":    _novo(CFG_DR_RAIMUNDO),
+    "pousada_maze":   _novo(CFG_POUSADA_MAZE),
 
     # ── Legados (não estavam na lista de migração; intactos) ───────────────
     "dra_francine":   _legado(build_crew_francine, san_francine),
